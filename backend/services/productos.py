@@ -7,10 +7,10 @@ def get_all():
     Obtiene todos los productos.
 
     Returns:
-        list: Lista de productos obtenidos desde el repositorio.
+        list: Lista de productos.
 
     Raises:
-        HTTPException: Si ocurre un error la base de datos (500).
+        HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
         return repo.get_all()
@@ -58,7 +58,7 @@ def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_ven
         id_categoria (int): ID de la categoría.
 
     Returns:
-        dict: Producto creado.
+        dict: Producto creado cons su ID asignado.
 
     Raises:
         HTTPException: Si ocurre un error en la base de datos (500).
@@ -91,7 +91,13 @@ def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, p
         HTTPException: Si el producto no existe (404).
         HTTPException: Si ocurre un error en la base de datos (500).
     """
-    p = repo.update(id, id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria)
+    try:
+        p = repo.update(id, id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria)
+    except DatabaseError:
+        raise HTTPException(
+            status_code=500,
+            detail="Error de base de datos al actualizar el producto"
+        )
     if p is None:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return p
@@ -107,6 +113,12 @@ def delete(id: int):
         HTTPException: Si el producto no existe (404).
         HTTPException: Si ocurre un error en la base de datos (500).
     """
-    p = repo.delete(id)
+    try:
+        p = repo.delete(id)
+    except DatabaseError:
+        raise HTTPException(
+            status_code=500,
+            detail="Error de base de datos al eliminar el producto"
+        )
     if p is None:
         raise HTTPException(status_code=404, detail="Producto no encontrado")

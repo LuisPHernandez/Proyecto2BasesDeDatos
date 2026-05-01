@@ -96,7 +96,7 @@ def get_by_id(id: int):
     status_code=201,
     response_model=Producto,
     summary="Crear producto",
-    description="Crea un nuevo producto en el sistema."
+    description="Crea un nuevo producto."
 )
 def create(p: ProductoBase):
     """
@@ -109,7 +109,7 @@ def create(p: ProductoBase):
         Producto: Producto creado con su ID asignado.
 
     Raises:
-        HTTPException: Si ocurre un error en la creación (500).
+        HTTPException: Si ocurre un error interno (500).
     """
     return service.create(p.id_proveedor, p.nombre, p.unidades_disponibles, p.precio_venta, p.precio_compra, p.id_categoria)
 
@@ -133,7 +133,7 @@ def update(id: int, p: ProductoBase):
 
     Raises:
         HTTPException: Si el producto no existe (404).
-        HTTPException: Si ocurre un error en la actualización (500).
+        HTTPException: Si ocurre un error interno (500).
     """
     return service.update(id, p.id_proveedor, p.nombre, p.unidades_disponibles, p.precio_venta, p.precio_compra, p.id_categoria)
 
@@ -152,6 +152,6 @@ def delete(id: int):
 
     Raises:
         HTTPException: Si el producto no existe (404).
-        HTTPException: Si ocurre un error en la eliminación (500).
+        HTTPException: Si ocurre un error interno (500).
     """
     service.delete(id)

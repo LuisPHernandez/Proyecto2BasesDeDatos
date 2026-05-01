@@ -13,30 +13,20 @@ CREATE TABLE producto (
     unidades_disponibles INTEGER NOT NULL,
     precio_venta DECIMAL(10,2) NOT NULL,
     precio_compra DECIMAL(10,2) NOT NULL,
+    id_categoria INTEGER NOT NULL,
 
     CONSTRAINT fk_producto_proveedor
         FOREIGN KEY (id_proveedor)
-        REFERENCES proveedor(id_proveedor)
+        REFERENCES proveedor(id_proveedor),
+    
+    CONSTRAINT fk_producto_categoria
+        FOREIGN KEY (id_categoria)
+        REFERENCES categoria(id_categoria)
 );
 
 CREATE TABLE categoria (
     id_categoria INTEGER PRIMARY KEY,
     nombre TEXT NOT NULL
-);
-
-CREATE TABLE producto_categoria (
-    id_producto INTEGER NOT NULL,
-    id_categoria INTEGER NOT NULL,
-
-    PRIMARY KEY (id_producto, id_categoria),
-
-    CONSTRAINT fk_producto_categoria_producto
-        FOREIGN KEY (id_producto)
-        REFERENCES producto(id_producto),
-
-    CONSTRAINT fk_producto_categoria_categoria
-        FOREIGN KEY (id_categoria)
-        REFERENCES categoria(id_categoria)
 );
 
 CREATE TABLE empleado (

@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./db/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5555:5555"
+
+  backend:
+    build: ./backend
+    env_file: .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

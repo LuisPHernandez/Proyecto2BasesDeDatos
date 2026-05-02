@@ -20,6 +20,24 @@ def get_all():
             detail="Error de base de datos al obtener los productos"
         )
 
+def get_low_stock():
+    """
+    Obtiene los productos con bajo stock.
+
+    Returns:
+        list: Lista de productos con bajo stock.
+
+    Raises:
+        HTTPException: Si ocurre un error en la base de datos (500).
+    """
+    try:
+        return repo.get_low_stock()
+    except DatabaseError:
+        raise HTTPException(
+            status_code=500,
+            detail="Error de base de datos al obtener los productos con bajo stock"
+        )
+
 def get_by_id(id: int):
     """
     Obtiene un producto por su ID.

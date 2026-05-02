@@ -32,6 +32,36 @@ def get_all():
         cur.close()
         conn.close()
 
+def get_low_stock():
+    """
+    Obtiene los productos con bajo stock que han sido vendidos al menos una vez.
+
+    Returns:
+        list: Lista de productos con bajo stock.
+
+    Raises:
+        DatabaseError: Si ocurre un error al consultar la base de datos.
+    """
+    conn = None
+    cur = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT DISTINCT id_producto
+            FROM detalle_venta
+            WHERE id_producto IN (
+                SELECT id_producto FROM productos WHERE stock < 10
+            );
+        """)
+        return cur.fetchall()
+    except DatabaseError as e:
+        print(f"Error de base de datos en get_low_stock productos: {e}")
+        raise
+    finally:
+        cur.close()
+        conn.close()
+
 def get_by_id(id: int):
     """
     Obtiene un producto por su ID.

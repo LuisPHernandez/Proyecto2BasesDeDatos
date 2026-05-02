@@ -69,6 +69,23 @@ def get_all():
     return service.get_all()
 
 @router.get(
+    "/low-stock",
+    status_code=200,
+    response_model=List[int],
+    summary="Obtener IDs de productos con bajo stock",
+    description="Devuelve una lista de IDs de productos con stock menor al umbral definido que han sido vendidos al menos una vez."
+)
+def get_low_stock():
+    """
+    Returns:
+        List[int]: IDs de productos con bajo stock.
+
+    Raises:
+        HTTPException: Si ocurre un error interno (500).
+    """
+    return service.get_low_stock()
+
+@router.get(
     "/{id}",
     status_code=200,
     response_model=ProductoDetailed,

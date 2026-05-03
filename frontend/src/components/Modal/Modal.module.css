@@ -1,0 +1,104 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalHeader h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #6b7280;
+    line-height: 1;
+}
+
+.closeButton:hover {
+    color: #111;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.field label {
+    font-size: 0.85rem;
+    color: black;
+}
+
+.field input {
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.field input:focus {
+    outline: none;
+    border-color: #222;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.cancelButton {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #3D3D3D;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.cancelButton:hover {
+    background: #7A7A7A;
+}
+
+.submitButton {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #3D3D3D;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.submitButton:hover {
+    background: #7A7A7A;
+}

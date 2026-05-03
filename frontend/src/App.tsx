@@ -2,7 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Navbar from "./components/Navbar/Navbar"
 import Home from "./pages/Home/Home"
 import Inventario from "./pages/Inventario/Inventario"
-import Proveedores from "./pages/Proveedores"
+import Proveedores from "./pages/Proveedores/Proveedores"
 import VentaDetalle from "./pages/VentaDetalle/VentaDetalle"
 import Ventas from "./pages/Ventas/Ventas"
 

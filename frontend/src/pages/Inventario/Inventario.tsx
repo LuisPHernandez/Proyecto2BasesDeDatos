@@ -77,6 +77,9 @@ function Inventario() {
                 >
                     {lowStockFilter ? 'Mostrar todos los productos' : 'Mostrar solo los productos con stock bajo'}
                 </button>
+                <button className={styles.createButton}>
+                    + Nuevo producto
+                </button>
             </div>
 
             <table className={styles.table}>
@@ -100,6 +103,7 @@ function Inventario() {
                                     <td>{p.id_producto}</td>
                                     <td>
                                         <input
+                                            className={styles.inlineInput}
                                             value={editForm.nombre ?? ''}
                                             onChange={e => setEditForm(f => ({ ...f, nombre: e.target.value }))}
                                         />
@@ -108,6 +112,7 @@ function Inventario() {
                                     <td>{p.proveedor}</td>
                                     <td>
                                         <input
+                                            className={styles.inlineInput}
                                             type="number"
                                             value={editForm.precio_compra ?? ''}
                                             onChange={e => setEditForm(f => ({ ...f, precio_compra: +e.target.value }))}
@@ -115,6 +120,7 @@ function Inventario() {
                                     </td>
                                     <td>
                                         <input
+                                            className={styles.inlineInput}
                                             type="number"
                                             value={editForm.precio_venta ?? ''}
                                             onChange={e => setEditForm(f => ({ ...f, precio_venta: +e.target.value }))}
@@ -122,14 +128,15 @@ function Inventario() {
                                     </td>
                                     <td>
                                         <input
+                                            className={styles.inlineInput}
                                             type="number"
                                             value={editForm.unidades_disponibles ?? ''}
                                             onChange={e => setEditForm(f => ({ ...f, unidades_disponibles: +e.target.value }))}
                                         />
                                     </td>
                                     <td>
-                                        <button onClick={() => handleGuardar(p)}>Guardar</button>
-                                        <button onClick={() => setEditandoId(null)}>Cancelar</button>
+                                        <button className={styles.saveButton} onClick={() => handleGuardar(p)}>Guardar</button>
+                                        <button className={styles.cancelButton} onClick={() => setEditandoId(null)}>Cancelar</button>
                                     </td>
                                 </>
                             ) : (

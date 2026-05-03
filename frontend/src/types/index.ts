@@ -44,3 +44,14 @@ export interface VentaProducto {
     precio_unitario: number
     cantidad: number
 }
+
+// ---------------------------- Proveedores ----------------------------
+
+export interface ProveedorBase {
+    nombre: string
+    email: string
+}
+
+export interface Proveedor extends ProveedorBase {
+    id_proveedor: number
+}

@@ -1,18 +1,18 @@
 CREATE DATABASE proyecto2;
 
 CREATE TABLE proveedor (
-    id_proveedor INTEGER PRIMARY KEY,
+    id_proveedor INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE categoria (
-    id_categoria INTEGER PRIMARY KEY,
+    id_categoria INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre TEXT NOT NULL
 );
 
 CREATE TABLE producto (
-    id_producto INTEGER PRIMARY KEY,
+    id_producto INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_proveedor INTEGER NOT NULL,
     nombre TEXT NOT NULL UNIQUE,
     unidades_disponibles INTEGER NOT NULL,
@@ -30,18 +30,18 @@ CREATE TABLE producto (
 );
 
 CREATE TABLE empleado (
-    id_empleado INTEGER PRIMARY KEY,
+    id_empleado INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre TEXT NOT NULL
 );
 
 CREATE TABLE cliente (
-    id_cliente INTEGER PRIMARY KEY,
+    id_cliente INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE venta (
-    id_venta INTEGER PRIMARY KEY,
+    id_venta INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_empleado INTEGER NOT NULL,
     id_cliente INTEGER NOT NULL,
     fecha DATE NOT NULL,

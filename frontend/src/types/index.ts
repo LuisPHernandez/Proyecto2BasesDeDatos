@@ -91,3 +91,7 @@ export interface CategoriaBase {
 export interface Categoria extends CategoriaBase {
     id_categoria: number
 }
+
+export interface CategoriaIncome extends Categoria {
+    ingresos: number
+}

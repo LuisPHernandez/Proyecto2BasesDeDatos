@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
-import { createCategoria, deleteCategoria, getCategorias, updateCategoria } from '../../api/categorias'
+import { createCategoria, deleteCategoria, getCategorias, getCategoriasWithIncome, updateCategoria } from '../../api/categorias'
 import ActionsMenu from '../../components/ActionsMenu/ActionsMenu'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import CrearCategoriaModal from '../../components/Modal/CrearCategoriaModal'
-import type { Categoria, CategoriaBase } from '../../types'
+import type { Categoria, CategoriaBase, CategoriaIncome } from '../../types'
 import styles from './Categorias.module.css'
 
 function Categorias() {
     const [categorias, setCategorias] = useState<Categoria[]>([])
+    const [categoriasIncome, setCategoriasIncome] = useState<CategoriaIncome[]>([])
+    const [verIngresos, setVerIngresos] = useState(false)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [editandoId, setEditandoId] = useState<number | null>(null)
@@ -28,6 +30,19 @@ function Categorias() {
         }
         load()
     }, [])
+
+    const handleToggleIngresos = async () => {
+        if (!verIngresos && categoriasIncome.length === 0) {
+            try {
+                const data = await getCategoriasWithIncome()
+                setCategoriasIncome(data)
+            } catch (e: any) {
+                setError(e.message)
+                return
+            }
+        }
+        setVerIngresos(prev => !prev)
+    }
 
     const handleCrear = async (data: CategoriaBase) => {
         const nuevo = await createCategoria(data)
@@ -62,10 +77,15 @@ function Categorias() {
     if (loading) return <p>Cargando...</p>
     if (error) return <p>Error: {error}</p>
 
+    const filas = verIngresos ? categoriasIncome : categorias
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <h1>Categorías de productos</h1>
+                <button className={styles.filterButton} onClick={handleToggleIngresos}>
+                    {verIngresos ? 'Ver todas' : 'Ver por ingresos'}
+                </button>
                 <button className={styles.createButton} onClick={() => setMostrarCrear(true)}>
                     + Nueva categoría
                 </button>
@@ -76,11 +96,12 @@ function Categorias() {
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
+                        {verIngresos && <th>Ingresos</th>}
                         <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {categorias.map(p => (
+                    {filas.map((p: Categoria | CategoriaIncome) => (
                         <tr key={p.id_categoria}>
                             {editandoId === p.id_categoria ? (
                                 <>
@@ -92,6 +113,7 @@ function Categorias() {
                                             onChange={e => setEditForm(f => ({ ...f, nombre: e.target.value }))}
                                         />
                                     </td>
+                                    {verIngresos && <td>{'ingresos' in p ? `Q${p.ingresos.toFixed(2)}` : '-'}</td>}
                                     <td>
                                         <button className={styles.saveButton} onClick={() => handleGuardar(p)}>Guardar</button>
                                         <button className={styles.cancelButton} onClick={() => setEditandoId(null)}>Cancelar</button>
@@ -101,6 +123,7 @@ function Categorias() {
                                 <>
                                     <td>{p.id_categoria}</td>
                                     <td>{p.nombre}</td>
+                                    {verIngresos && <td>{'ingresos' in p ? `Q${p.ingresos.toFixed(2)}` : '-'}</td>}
                                     <td>
                                         <ActionsMenu
                                             onEditar={() => handleEditar(p)}

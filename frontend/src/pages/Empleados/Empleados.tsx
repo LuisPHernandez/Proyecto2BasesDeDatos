@@ -65,7 +65,7 @@ function Empleados() {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <h1>Empleados</h1>
+                <h1>Empleados con más ventas</h1>
                 <button className={styles.createButton} onClick={() => setMostrarCrear(true)}>
                     + Nuevo empleado
                 </button>

@@ -28,6 +28,40 @@ def get_all():
         if conn is not None:
             conn.close()
 
+def get_income():
+    """
+    Obtiene las categorías con sus ingresos.
+
+    Returns:
+        list: Lista de categorías con sus ingresos.
+
+    Raises:
+        DatabaseError: Si ocurre un error al consultar la base de datos.
+    """
+    conn = None
+    cur = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT c.id_categoria, c.nombre, SUM(dv.precio_unitario * dv.cantidad) AS ingresos
+            FROM categoria c
+            JOIN producto p ON c.id_categoria = p.id_categoria
+            JOIN detalle_venta dv ON p.id_producto = dv.id_producto
+            GROUP BY c.id_categoria, c.nombre
+            HAVING SUM(dv.precio_unitario * dv.cantidad) > 1
+            ORDER BY ingresos DESC;
+        """)
+        return cur.fetchall()
+    except DatabaseError as e:
+        print(f"Error de base de datos en get_income categoria: {e}")
+        raise
+    finally:
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
+
 def create(nombre: str):
     """
     Crea una nueva categoría.

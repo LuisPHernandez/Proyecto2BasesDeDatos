@@ -25,6 +25,17 @@ class Categoria(CategoriaBase):
     """
     id_categoria: int
 
+class CategoriaConIngresos(Categoria):
+    """
+    Modelo con identificador que se devuelve al obtener las categorías con sus ingresos.
+
+    Extiende Categoria agregando el ID de la categoría.
+
+    Attributes:
+        ingresos (float): Ingresos de la categoría.
+    """
+    ingresos: float
+
 @router.get(
     "/",
     status_code=200,
@@ -43,6 +54,25 @@ def get_all():
         HTTPException: Si ocurre un error interno (500).
     """
     return service.get_all()
+
+@router.get(
+    "/ingresos",
+    status_code=200,
+    response_model=List[CategoriaConIngresos],
+    summary="Obtener categorías con sus ingresos",
+    description="Devuelve una lista de todas las categorías con sus ingresos."
+)
+def get_income():
+    """
+    Obtiene las categorías con sus ingresos.
+
+    Returns:
+        List[CategoriaConIngresos]: Lista de categorías con sus ingresos.
+
+    Raises:
+        HTTPException: Si ocurre un error interno (500).
+    """
+    return service.get_income()
 
 @router.post(
     "/",

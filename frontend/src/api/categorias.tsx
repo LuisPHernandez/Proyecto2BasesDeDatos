@@ -1,10 +1,16 @@
-import type { CategoriaBase } from "../types"
+import type { CategoriaBase, CategoriaIncome } from "../types"
 
 const BASE = '/api/categorias/'
 
 export async function getCategorias() {
     const res = await fetch(BASE)
     if (!res.ok) throw new Error('Error al obtener categorias')
+    return res.json()
+}
+
+export async function getCategoriasWithIncome(): Promise<CategoriaIncome[]> {
+    const res = await fetch(`${BASE}ingresos`)
+    if (!res.ok) throw new Error('Error al obtener categorias con sus ingresos')
     return res.json()
 }
 

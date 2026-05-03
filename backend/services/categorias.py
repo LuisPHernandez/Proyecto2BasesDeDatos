@@ -20,6 +20,24 @@ def get_all():
             detail="Error de base de datos al obtener las categorías"
         )
 
+def get_income():
+    """
+    Obtiene las categorías con sus ingresos.
+
+    Returns:
+        list: Lista de categorías con sus ingresos.
+
+    Raises:
+        HTTPException: Si ocurre un error en la base de datos (500).
+    """
+    try:
+        return repo.get_income()
+    except DatabaseError:
+        raise HTTPException(
+            status_code=500,
+            detail="Error de base de datos al obtener las categorías con sus ingresos"
+        )
+
 def create(nombre: str):
     """
     Crea una nueva categoría.

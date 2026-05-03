@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { deleteProducto, getLowStockIds, getProductos, updateProducto } from '../../api/productos'
 import ActionsMenu from '../../components/ActionsMenu/ActionsMenu'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
+import StockBadge from '../../components/StockBadge/StockBadge'
 import type { Producto, ProductoDetailed } from '../../types'
 import styles from './Inventario.module.css'
 
@@ -133,6 +134,7 @@ function Inventario() {
                                             value={editForm.unidades_disponibles ?? ''}
                                             onChange={e => setEditForm(f => ({ ...f, unidades_disponibles: +e.target.value }))}
                                         />
+                                        <StockBadge show={lowStockIds.includes(p.id_producto)} />
                                     </td>
                                     <td>
                                         <button className={styles.saveButton} onClick={() => handleGuardar(p)}>Guardar</button>
@@ -147,7 +149,10 @@ function Inventario() {
                                     <td>{p.proveedor}</td>
                                     <td>{p.precio_compra}</td>
                                     <td>{p.precio_venta}</td>
-                                    <td>{p.unidades_disponibles}</td>
+                                    <td>
+                                        {p.unidades_disponibles}
+                                        <StockBadge show={lowStockIds.includes(p.id_producto)} />
+                                    </td>
                                     <td>
                                         <ActionsMenu
                                             onEditar={() => handleEditar(p)}

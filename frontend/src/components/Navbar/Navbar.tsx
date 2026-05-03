@@ -4,8 +4,11 @@ import styles from './Navbar.module.css'
 const links = [
     { to: "/", label: "Home" },
     { to: "/inventario", label: "Inventario" },
+    { to: "/proveedores", label: "Proveedores" },
+    { to: "/categorias", label: "Categorias" },
     { to: "/ventas", label: "Ventas" },
-    { to: "/proveedores", label: "Proveedores" }
+    { to: "/clientes", label: "Clientes" },
+    { to: "/empleados", label: "Empleados" }
 ]
 
 function Navbar() {

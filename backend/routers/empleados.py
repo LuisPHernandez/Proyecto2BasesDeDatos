@@ -64,7 +64,7 @@ def create(e: EmpleadoBase):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.create(e.nombre, e.email)
+    return service.create(e.nombre)
 
 @router.put(
     "/{id}",

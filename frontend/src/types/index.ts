@@ -55,3 +55,34 @@ export interface ProveedorBase {
 export interface Proveedor extends ProveedorBase {
     id_proveedor: number
 }
+
+// ---------------------------- Clientes ----------------------------
+
+export interface ClienteBase {
+    nombre: string
+    email: string
+}
+
+export interface Cliente extends ClienteBase {
+    id_cliente: number
+}
+
+// ---------------------------- Empleados ----------------------------
+
+export interface EmpleadoBase {
+    nombre: string
+}
+
+export interface Empleado extends EmpleadoBase {
+    id_empleado: number
+}
+
+// ---------------------------- Categorias ----------------------------
+
+export interface CategoriaBase {
+    nombre: string
+}
+
+export interface Categoria extends CategoriaBase {
+    id_categoria: number
+}

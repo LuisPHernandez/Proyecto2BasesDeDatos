@@ -46,7 +46,7 @@ def create(nombre: str):
     try:
         conn = get_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("INSERT INTO categoria (nombre) VALUES (%s) RETURNING *", (nombre))
+        cur.execute("INSERT INTO categoria (nombre) VALUES (%s) RETURNING *", (nombre,))
         categoria = cur.fetchone()
         conn.commit()
         return categoria

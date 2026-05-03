@@ -6,6 +6,11 @@ CREATE TABLE proveedor (
     email TEXT NOT NULL UNIQUE
 );
 
+CREATE TABLE categoria (
+    id_categoria INTEGER PRIMARY KEY,
+    nombre TEXT NOT NULL
+);
+
 CREATE TABLE producto (
     id_producto INTEGER PRIMARY KEY,
     id_proveedor INTEGER NOT NULL,
@@ -22,11 +27,6 @@ CREATE TABLE producto (
     CONSTRAINT fk_producto_categoria
         FOREIGN KEY (id_categoria)
         REFERENCES categoria(id_categoria)
-);
-
-CREATE TABLE categoria (
-    id_categoria INTEGER PRIMARY KEY,
-    nombre TEXT NOT NULL
 );
 
 CREATE TABLE empleado (

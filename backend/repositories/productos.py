@@ -29,8 +29,10 @@ def get_all():
         print(f"Error de base de datos en get_all productos: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def get_low_stock():
     """
@@ -51,7 +53,7 @@ def get_low_stock():
             SELECT DISTINCT id_producto
             FROM detalle_venta
             WHERE id_producto IN (
-                SELECT id_producto FROM productos WHERE stock < 10
+                SELECT id_producto FROM producto WHERE unidades_disponibles < 10
             );
         """)
         return cur.fetchall()
@@ -59,8 +61,10 @@ def get_low_stock():
         print(f"Error de base de datos en get_low_stock productos: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def get_by_id(id: int):
     """
@@ -92,8 +96,10 @@ def get_by_id(id: int):
         print(f"Error de base de datos en get_by_id productos: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int):
     """
@@ -131,8 +137,10 @@ def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_ven
         print(f"Error de base de datos en create productos: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int):
     """
@@ -172,8 +180,10 @@ def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, p
         print(f"Error de base de datos en update productos: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def delete(id: int):
     """
@@ -204,5 +214,7 @@ def delete(id: int):
         print(f"Error de base de datos en delete productos: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()

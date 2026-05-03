@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List
-from services import proveedor as service
+from services import proveedores as service
 
 router = APIRouter()
 

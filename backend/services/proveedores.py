@@ -1,4 +1,4 @@
-from repositories import proveedor as repo
+from repositories import proveedores as repo
 from fastapi import HTTPException
 from psycopg2 import DatabaseError
 

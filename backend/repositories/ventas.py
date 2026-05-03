@@ -36,8 +36,10 @@ def get_all(fecha_inicio: date, fecha_fin: date):
         print(f"Error de base de datos en get_all ventas: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def get_by_id(id: int):
     """
@@ -68,8 +70,10 @@ def get_by_id(id: int):
         print(f"Error de base de datos en get_by_id ventas: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def get_productos_by_id(id: int):
     """
@@ -100,8 +104,10 @@ def get_productos_by_id(id: int):
         print(f"Error de base de datos en get_productos_by_id ventas: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def create(id_cliente: int, id_empleado: int, fecha: date, total: float):
     """
@@ -135,8 +141,10 @@ def create(id_cliente: int, id_empleado: int, fecha: date, total: float):
         print(f"Error de base de datos en create ventas: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def delete(id: int):
     """
@@ -167,5 +175,7 @@ def delete(id: int):
         print(f"Error de base de datos en delete ventas: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()

@@ -10,11 +10,13 @@ services:
       - ./db/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "5555:5555"
+      - "5555:5432"
 
   backend:
     build: ./backend
     env_file: .env
+    volumes:
+      - ./backend:/app
     ports:
       - "8000:8000"
     depends_on:
@@ -24,6 +26,9 @@ services:
     build: ./frontend
     ports:
       - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
 

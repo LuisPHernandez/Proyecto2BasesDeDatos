@@ -23,8 +23,10 @@ def get_all():
         print(f"Error de base de datos en get_all proveedor: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def create(nombre: str, email: str):
     """
@@ -54,8 +56,10 @@ def create(nombre: str, email: str):
         print(f"Error de base de datos en create proveedor: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def update(id: int, nombre: str, email: str):
     """
@@ -86,8 +90,10 @@ def update(id: int, nombre: str, email: str):
         print(f"Error de base de datos en update proveedor: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
 
 def delete(id: int):
     """
@@ -116,5 +122,7 @@ def delete(id: int):
         print(f"Error de base de datos en delete proveedor: {e}")
         raise
     finally:
-        cur.close()
-        conn.close()
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()    

@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from services import ventas as service
 from typing import List
-from datetime import date
+from datetime import datetime
 
 router = APIRouter()
 
@@ -13,12 +13,12 @@ class VentaBase(BaseModel):
     Attributes:
         id_cliente (int): ID del cliente.
         id_empleado (int): ID del empleado.
-        fecha (date): Fecha de la venta.
+        fecha (datetime): Fecha de la venta.
         total (float): Total de la venta.
     """
     id_cliente: int
     id_empleado: int
-    fecha: date
+    fecha: datetime
     total: float
 
 class Venta(VentaBase):
@@ -41,14 +41,14 @@ class VentaSummary(BaseModel):
         nombre_empleado (str): Nombre del empleado.
         email_cliente (str): Email del cliente.
         nombre_cliente (str): Nombre del cliente.
-        fecha (date): Fecha de la venta.
+        fecha (datetime): Fecha de la venta.
         total (float): Total de la venta.
     """
     id_venta: int
     nombre_empleado: str
     email_cliente: str
     nombre_cliente: str
-    fecha: date
+    fecha: datetime
     total: float
 
 class VentaProducto(BaseModel):
@@ -73,13 +73,13 @@ class VentaProducto(BaseModel):
     summary="Obtener todas las ventas realizadas en un rango de fechas",
     description="Devuelve una lista de todas las ventas realizadas en un rango de fechas."
 )
-def get_all(fecha_inicio: date, fecha_fin: date):
+def get_all(fecha_inicio: datetime, fecha_fin: datetime):
     """
     Obtiene todas las ventas realizadas en un rango de fechas.
 
     Args:
-        fecha_inicio (date): Fecha inicial del rango.
-        fecha_fin (date): Fecha final del rango.
+        fecha_inicio (datetime): Fecha inicial del rango.
+        fecha_fin (datetime): Fecha final del rango.
 
     Returns:
         List[VentaSummary]: Lista de ventas.

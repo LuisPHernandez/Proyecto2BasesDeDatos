@@ -1,3 +1,4 @@
+// ---------------------------- Productos ---------------------------- 
 export interface ProductoBase {
     id_proveedor: number
     nombre: string
@@ -14,4 +15,32 @@ export interface Producto extends ProductoBase {
 export interface ProductoDetailed extends Producto {
     proveedor: string
     categoria: string
+}
+
+// ---------------------------- Ventas ---------------------------- 
+export interface VentaBase {
+    id_cliente: number
+    id_empleado: number
+    fecha: Date
+    total: number
+}
+
+export interface Venta extends VentaBase {
+    id_venta: number
+}
+
+export interface VentaSummary {
+    id_venta: number
+    nombre_empleado: string
+    email_cliente: string
+    nombre_cliente: string
+    fecha: Date
+    total: number
+}
+
+export interface VentaProducto {
+    id_producto: number
+    nombre_producto: string
+    precio_unitario: number
+    cantidad: number
 }

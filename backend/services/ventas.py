@@ -1,15 +1,15 @@
 from repositories import ventas as repo
 from fastapi import HTTPException
 from psycopg2 import DatabaseError
-from datetime import date
+from datetime import datetime
 
-def get_all(fecha_inicio: date, fecha_fin: date):
+def get_all(fecha_inicio: datetime, fecha_fin: datetime):
     """
     Obtiene todas las ventas realizadas en un rango de fechas.
 
     Args:
-        fecha_inicio (date): Fecha inicial del rango.
-        fecha_fin (date): Fecha final del rango.
+        fecha_inicio (datetime): Fecha inicial del rango.
+        fecha_fin (datetime): Fecha final del rango.
 
     Returns:
         list: Lista de ventas.
@@ -71,14 +71,14 @@ def get_productos_by_id(id: int):
             detail="Error de base de datos al obtener los productos de la venta"
         )
 
-def create(id_cliente: int, id_empleado: int, fecha: date, total: float):
+def create(id_cliente: int, id_empleado: int, fecha: datetime, total: float):
     """
     Crea una nueva venta.
 
     Args:
         id_cliente (int): ID del cliente.
         id_empleado (int): ID del empleado.
-        fecha (date): Fecha de la venta.
+        fecha (datetime): Fecha de la venta.
         total (float): Total de la venta.
 
     Returns:

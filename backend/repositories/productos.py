@@ -56,7 +56,8 @@ def get_low_stock():
                 SELECT id_producto FROM producto WHERE unidades_disponibles < 10
             );
         """)
-        return cur.fetchall()
+        rows = cur.fetchall()
+        return [row["id_producto"] for row in rows]
     except DatabaseError as e:
         print(f"Error de base de datos en get_low_stock productos: {e}")
         raise
@@ -90,7 +91,7 @@ def get_by_id(id: int):
             JOIN proveedor pv ON pr.id_proveedor = pv.id_proveedor
             JOIN categoria c ON pr.id_categoria = c.id_categoria
             WHERE pr.id_producto = %s
-        """, (id))
+        """, (id,))
         return cur.fetchone()
     except DatabaseError as e:
         print(f"Error de base de datos en get_by_id productos: {e}")

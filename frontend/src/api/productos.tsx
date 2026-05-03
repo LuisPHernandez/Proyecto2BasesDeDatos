@@ -41,7 +41,6 @@ export async function updateProducto(id: number, data: ProductoBase) {
 }
 
 export async function deleteProducto(id: number) {
-    const res = await fetch(`${BASE}/${id}`, { method: 'DELETE' })
+    const res = await fetch(`${BASE}${id}`, { method: 'DELETE' })
     if (!res.ok) throw new Error('Error al eliminar producto')
-    return res.json()
 }

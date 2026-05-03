@@ -1,10 +1,10 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Navbar from "./components/Navbar/Navbar"
-import Home from "./pages/Home"
+import Home from "./pages/Home/Home"
 import Inventario from "./pages/Inventario/Inventario"
 import Proveedores from "./pages/Proveedores"
-import VentaDetalle from "./pages/VentaDetalle"
-import Ventas from "./pages/Ventas"
+import VentaDetalle from "./pages/VentaDetalle/VentaDetalle"
+import Ventas from "./pages/Ventas/Ventas"
 
 function App() {
   return (

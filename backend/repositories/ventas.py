@@ -1,15 +1,15 @@
 from database import get_connection
 from psycopg2.extras import RealDictCursor
 from psycopg2 import DatabaseError
-from datetime import date
+from datetime import datetime
 
-def get_all(fecha_inicio: date, fecha_fin: date):
+def get_all(fecha_inicio: datetime, fecha_fin: datetime):
     """
     Obtiene todas las ventas realizadas en un rango de fechas.
 
     Args:
-        fecha_inicio (date): Fecha inicial del rango.
-        fecha_fin (date): Fecha final del rango.
+        fecha_inicio (datetime): Fecha inicial del rango.
+        fecha_fin (datetime): Fecha final del rango.
 
     Returns:
         list: Lista de ventas.
@@ -23,12 +23,12 @@ def get_all(fecha_inicio: date, fecha_fin: date):
         conn = get_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute("""
-            SELECT v.id_venta, v.fecha, v.total, e.nombre AS nombre_empleado, c.email AS email_cliente
+            SELECT v.id_venta, v.fecha, v.total, e.nombre AS nombre_empleado, c.email AS email_cliente, c.nombre AS nombre_cliente
             FROM venta v
             JOIN empleado e ON v.id_empleado = e.id_empleado
             JOIN cliente c ON v.id_cliente = c.id_cliente
             WHERE v.fecha BETWEEN %s AND %s
-            ORDER BY v.id_venta
+            ORDER BY v.fecha DESC
         """, (fecha_inicio, fecha_fin))
         return cur.fetchall()
     except DatabaseError as e:
@@ -59,13 +59,14 @@ def get_by_id(id: int):
     try:
         conn = get_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.executr("""
-            SELECT v.id_venta, v.fecha, v.total, e.nombre AS nombre_empleado, c.email AS email_cliente
+        cur.execute("""
+            SELECT v.id_venta, v.fecha, v.total, e.nombre AS nombre_empleado, c.email AS email_cliente, c.nombre AS nombre_cliente
             FROM venta v
             JOIN empleado e ON v.id_empleado = e.id_empleado
             JOIN cliente c ON v.id_cliente = c.id_cliente
             WHERE v.id_venta = %s
-        """, (id))
+        """, (id,))
+        return cur.fetchone()
     except DatabaseError as e:
         print(f"Error de base de datos en get_by_id ventas: {e}")
         raise
@@ -93,12 +94,12 @@ def get_productos_by_id(id: int):
     try:
         conn = get_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.executr("""
-            SELECT p.id_producto, p.nombre, dv.precio_unitario, dv.cantidad
+        cur.execute("""
+            SELECT p.id_producto, p.nombre AS nombre_producto, dv.precio_unitario, dv.cantidad
             FROM detalle_venta dv
             JOIN producto p ON dv.id_producto = p.id_producto
             WHERE dv.id_venta = %s
-        """, (id))
+        """, (id,))
         return cur.fetchall()
     except DatabaseError as e:
         print(f"Error de base de datos en get_productos_by_id ventas: {e}")
@@ -109,14 +110,14 @@ def get_productos_by_id(id: int):
         if conn is not None:
             conn.close()
 
-def create(id_cliente: int, id_empleado: int, fecha: date, total: float):
+def create(id_cliente: int, id_empleado: int, fecha: datetime, total: float):
     """
     Crea una nueva venta.
 
     Args:
         id_cliente (int): ID del cliente.
         id_empleado (int): ID del empleado.
-        fecha (date): Fecha de la venta.
+        fecha (datetime): Fecha de la venta.
         total (float): Total de la venta.
 
     Returns:
@@ -166,7 +167,7 @@ def delete(id: int):
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute("""
             DELETE FROM venta WHERE id_venta = %s RETURNING *
-        """, (id))
+        """, (id,))
         venta = cur.fetchone()
         conn.commit()
         return venta

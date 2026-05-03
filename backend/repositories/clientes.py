@@ -28,6 +28,42 @@ def get_all():
         if conn is not None:
             conn.close()
 
+def get_active():
+    """
+    Obtiene los clientes activos.
+
+    Returns:
+        list: Lista de clientes activos.
+
+    Raises:
+        DatabaseError: Si ocurre un error al consultar la base de datos.
+    """
+    conn = None
+    cur = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            SELECT id_cliente
+            FROM cliente
+            WHERE id_cliente IN (
+                SELECT DISTINCT id_cliente
+                FROM venta
+                WHERE fecha >= CURRENT_DATE - INTERVAL '1 month'
+            )
+            ORDER BY id_cliente
+        """)
+        rows = cur.fetchall()
+        return [row["id_cliente"] for row in rows]
+    except DatabaseError as e:
+        print(f"Error de base de datos en get_active cliente: {e}")
+        raise
+    finally:
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
+
 def create(nombre: str, email: str):
     """
     Crea un nuevo cliente.

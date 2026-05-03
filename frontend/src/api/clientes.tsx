@@ -8,6 +8,12 @@ export async function getClientes() {
     return res.json()
 }
 
+export async function getActiveIds() {
+    const res = await fetch(`${BASE}activos`)
+    if (!res.ok) throw new Error('Error al obtener clientes activos')
+    return res.json()
+}
+
 export async function createCliente(data: ClienteBase) {
     const res = await fetch(BASE, {
         method: 'POST',

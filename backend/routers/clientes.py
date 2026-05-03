@@ -46,6 +46,25 @@ def get_all():
     """
     return service.get_all()
 
+@router.get(
+    "/activos",
+    status_code=200,
+    response_model=List[int],
+    summary="Obtener clientes activos",
+    description="Devuelve una lista de clientes que han realizado compras en el último mes."
+)
+def get_active():
+    """
+    Obtiene los clientes activos.
+
+    Returns:
+        List[int]: Lista de IDs de clientes que han realizado compras en el último mes.
+
+    Raises:
+        HTTPException: Si ocurre un error interno (500).
+    """
+    return service.get_active()
+
 @router.post(
     "/",
     status_code=201,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createCliente, deleteCliente, getClientes, updateCliente } from '../../api/clientes'
+import { createCliente, deleteCliente, getActiveIds, getClientes, updateCliente } from '../../api/clientes'
 import ActionsMenu from '../../components/ActionsMenu/ActionsMenu'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import CrearClienteModal from '../../components/Modal/CrearClienteModal'
@@ -10,6 +10,8 @@ function Clientes() {
     const [clientes, setClientes] = useState<Cliente[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+    const [activeIds, setActiveIds] = useState<number[]>([])
+    const [activeFilter, setActiveFilter] = useState(false)
     const [editandoId, setEditandoId] = useState<number | null>(null)
     const [editForm, setEditForm] = useState<ClienteBase>({ nombre: '', email: '' })
     const [confirmarId, setConfirmarId] = useState<number | null>(null)
@@ -18,8 +20,12 @@ function Clientes() {
     useEffect(() => {
         const load = async () => {
             try {
-                const data = await getClientes()
+                const [data, ids] = await Promise.all([
+                    getClientes(),
+                    getActiveIds()
+                ])
                 setClientes(data)
+                setActiveIds(ids)
             } catch (e: any) {
                 setError(e.message)
             } finally {
@@ -62,10 +68,20 @@ function Clientes() {
     if (loading) return <p>Cargando...</p>
     if (error) return <p>Error: {error}</p>
 
+    const clientesMostrados = activeFilter
+        ? clientes.filter(c => activeIds.includes(c.id_cliente))
+        : clientes
+
     return (
         <div className={styles.container}>
             <div className={styles.header}>
                 <h1>Clientes</h1>
+                <button
+                    className={styles.filterButton}
+                    onClick={() => setActiveFilter(!activeFilter)}
+                >
+                    {activeFilter ? 'Mostrar todos los clientes' : 'Mostrar solo los clientes activos'}
+                </button>
                 <button className={styles.createButton} onClick={() => setMostrarCrear(true)}>
                     + Nuevo cliente
                 </button>
@@ -81,7 +97,7 @@ function Clientes() {
                     </tr>
                 </thead>
                 <tbody>
-                    {clientes.map(c => (
+                    {clientesMostrados.map(c => (
                         <tr key={c.id_cliente}>
                             {editandoId === c.id_cliente ? (
                                 <>

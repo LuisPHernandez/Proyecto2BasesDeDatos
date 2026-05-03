@@ -20,6 +20,24 @@ def get_all():
             detail="Error de base de datos al obtener los clientes"
         )
 
+def get_active():
+    """
+    Obtiene los clientes activos.
+
+    Returns:
+        list: Lista de clientes activos.
+
+    Raises:
+        HTTPException: Si ocurre un error en la base de datos (500).
+    """
+    try:
+        return repo.get_active()
+    except DatabaseError:
+        raise HTTPException(
+            status_code=500,
+            detail="Error de base de datos al obtener los clientes activos"
+        )
+
 def create(nombre: str, email: str):
     """
     Crea un nuevo cliente.

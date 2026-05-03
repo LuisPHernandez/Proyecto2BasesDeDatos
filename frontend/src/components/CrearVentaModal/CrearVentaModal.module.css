@@ -1,0 +1,267 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: calc(100vh - 128px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    color: #333;
+    min-width: 0;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sectionTitle {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #7A7A7A;
+    margin: 0;
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.field label {
+    font-size: 0.85rem;
+    color: #333;
+}
+
+.field select,
+.field input {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid #3D3D3D;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: white;
+    color: #333;
+    box-sizing: border-box;
+}
+
+.field select option {
+    background: white;
+    color: #333;
+}
+
+.field select:focus,
+.field input:focus {
+    outline: none;
+    border-color: #850000;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #d1d5db;
+    margin: 0;
+}
+
+.addProductRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 88px auto;
+    gap: 8px;
+    align-items: end;
+}
+
+.addBtn {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #850000;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.addBtn:hover {
+    background: #E90000;
+}
+
+.addBtn:disabled {
+    background: #7A7A7A;
+    cursor: not-allowed;
+}
+
+.itemsTable {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.itemsTable th {
+    text-align: left;
+    padding: 6px 8px;
+    border-bottom: 2px solid #d1d5db;
+    color: #3D3D3D;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.itemsTable td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-wrap: anywhere;
+    vertical-align: middle;
+}
+
+.itemsTable th:nth-child(1),
+.itemsTable td:nth-child(1) {
+    width: 38%;
+}
+
+.itemsTable th:nth-child(2),
+.itemsTable td:nth-child(2),
+.itemsTable th:nth-child(4),
+.itemsTable td:nth-child(4) {
+    width: 18%;
+}
+
+.itemsTable th:nth-child(3),
+.itemsTable td:nth-child(3) {
+    width: 12%;
+}
+
+.itemsTable th:nth-child(5),
+.itemsTable td:nth-child(5) {
+    width: 36px;
+    text-align: right;
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    color: #850000;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0 4px;
+}
+
+.removeBtn:hover {
+    color: #E90000;
+}
+
+.total {
+    text-align: right;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 8px 0 0;
+    color: #333;
+}
+
+.error {
+    color: #E90000;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 4px;
+    flex-wrap: wrap;
+}
+
+.cancelBtn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #3D3D3D;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.cancelBtn:hover {
+    background: #7A7A7A;
+}
+
+.submitBtn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #850000;
+    color: white;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.submitBtn:hover {
+    background: #E90000;
+}
+
+.submitBtn:disabled {
+    background: #7A7A7A;
+    cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+    .grid2,
+    .addProductRow {
+        grid-template-columns: 1fr;
+    }
+
+    .addBtn,
+    .cancelBtn,
+    .submitBtn {
+        width: 100%;
+    }
+
+    .itemsTable,
+    .itemsTable thead,
+    .itemsTable tbody,
+    .itemsTable tr,
+    .itemsTable th,
+    .itemsTable td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .itemsTable thead {
+        display: none;
+    }
+
+    .itemsTable tr {
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        padding: 8px;
+    }
+
+    .itemsTable td {
+        border-bottom: none;
+        padding: 4px 0;
+    }
+
+    .itemsTable td:nth-child(5) {
+        text-align: left;
+        padding-top: 8px;
+    }
+
+    .total {
+        text-align: left;
+    }
+
+    .actions {
+        flex-direction: column-reverse;
+    }
+}

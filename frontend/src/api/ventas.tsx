@@ -1,4 +1,4 @@
-import type { VentaBase } from "../types"
+import type { VentaCreateInput, VentaSummary } from "../types"
 
 const BASE = '/api/ventas/'
 
@@ -22,13 +22,16 @@ export async function getVentaProductosById(id: number) {
     return res.json()
 }
 
-export async function createVenta(data: VentaBase) {
+export async function createVenta(data: VentaCreateInput): Promise<VentaSummary> {
     const res = await fetch(BASE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-    if (!res.ok) throw new Error('Error al crear producto')
+    if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.detail ?? 'Error al crear venta')
+    }
     return res.json()
 }
 

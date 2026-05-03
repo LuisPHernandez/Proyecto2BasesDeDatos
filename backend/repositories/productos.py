@@ -67,6 +67,52 @@ def get_low_stock():
         if conn is not None:
             conn.close()
 
+def get_top_mes():
+    """
+    Obtiene los productos más vendidos del mes usando CTE.
+
+    Returns:
+        list[dict]: Lista de productos con unidades vendidas e ingresos.
+
+    Raises:
+        DatabaseError: Si ocurre un error al consultar la base de datos.
+    """
+    conn = None
+    cur = None
+    try:
+        conn = get_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute("""
+            WITH ventas_mes AS (
+                SELECT
+                    dv.id_producto,
+                    SUM(dv.cantidad)                        AS unidades_vendidas,
+                    SUM(dv.cantidad * dv.precio_unitario)   AS ingresos
+                FROM detalle_venta dv
+                JOIN venta v ON dv.id_venta = v.id_venta
+                WHERE DATE_TRUNC('month', v.fecha) = DATE_TRUNC('month', CURRENT_DATE)
+                GROUP BY dv.id_producto
+            )
+            SELECT
+                p.id_producto,
+                p.nombre,
+                vm.unidades_vendidas,
+                vm.ingresos
+            FROM ventas_mes vm
+            JOIN producto p ON p.id_producto = vm.id_producto
+            ORDER BY vm.unidades_vendidas DESC
+            LIMIT 5
+        """)
+        return cur.fetchall()
+    except DatabaseError as e:
+        print(f"Error de base de datos en get_top_mes productos: {e}")
+        raise
+    finally:
+        if cur is not None:
+            cur.close()
+        if conn is not None:
+            conn.close()
+
 def get_by_id(id: int):
     """
     Obtiene un producto por su ID.

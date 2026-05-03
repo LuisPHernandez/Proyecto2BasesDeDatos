@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
-import { deleteProducto, getLowStockIds, getProductos, updateProducto } from '../../api/productos'
+import { getCategorias } from '../../api/categorias'
+import { createProducto, deleteProducto, getLowStockIds, getProductos, getTopMes, updateProducto } from '../../api/productos'
+import { getProveedores } from '../../api/proveedores'
 import ActionsMenu from '../../components/ActionsMenu/ActionsMenu'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
+import CrearProductoModal from '../../components/Modal/CrearProductoModal'
 import StockBadge from '../../components/StockBadge/StockBadge'
-import type { Producto, ProductoDetailed } from '../../types'
+import type { Producto, ProductoBase, ProductoDetailed, ProductoTop } from '../../types'
 import styles from './Inventario.module.css'
 
 function Inventario() {
@@ -15,16 +18,20 @@ function Inventario() {
     const [editandoId, setEditandoId] = useState<number | null>(null)
     const [editForm, setEditForm] = useState<Partial<Producto>>({})
     const [confirmarId, setConfirmarId] = useState<number | null>(null)
+    const [mostrarCrearModal, setMostrarCrearModal] = useState(false)
+    const [topMes, setTopMes] = useState<ProductoTop[]>([])
 
     useEffect(() => {
         const load = async () => {
             try {
-                const [data, ids] = await Promise.all([
+                const [data, ids, top] = await Promise.all([
                     getProductos(),
-                    getLowStockIds()
+                    getLowStockIds(),
+                    getTopMes()
                 ])
                 setProductos(data)
                 setLowStockIds(ids)
+                setTopMes(top)
             } catch (e: any) {
                 setError(e.message)
             } finally {
@@ -43,6 +50,23 @@ function Inventario() {
         await updateProducto(p.id_producto, { ...p, ...editForm })
         setProductos(prev => prev.map(x => x.id_producto === p.id_producto ? { ...x, ...editForm } : x))
         setEditandoId(null)
+    }
+
+    const handleCrear = async (data: ProductoBase) => {
+        const [producto, proveedores, categorias] = await Promise.all([
+            createProducto(data),
+            getProveedores(),
+            getCategorias()
+        ])
+
+        const nuevoProducto: ProductoDetailed = {
+            ...producto,
+            proveedor: proveedores.find(p => p.id_proveedor === producto.id_proveedor)?.nombre ?? '',
+            categoria: categorias.find(c => c.id_categoria === producto.id_categoria)?.nombre ?? ''
+        }
+
+        setProductos(prev => [...prev, nuevoProducto])
+        return nuevoProducto
     }
 
     const handleEliminar = async () => {
@@ -78,10 +102,32 @@ function Inventario() {
                 >
                     {lowStockFilter ? 'Mostrar todos los productos' : 'Mostrar solo los productos con stock bajo'}
                 </button>
-                <button className={styles.createButton}>
+                <button className={styles.createButton} onClick={() => setMostrarCrearModal(true)}>
                     + Nuevo producto
                 </button>
             </div>
+
+            {topMes.length > 0 && (
+                <div className={styles.topMes}>
+                    <p className={styles.topMesTitle}>Top 5 más vendidos este mes</p>
+                    <div className={styles.topMesGrid}>
+                        <div className={styles.topMesHeader}>
+                            <span>Pos.</span>
+                            <span>Producto</span>
+                            <span>Unidades</span>
+                            <span>Ingresos</span>
+                        </div>
+                        {topMes.map((p, i) => (
+                            <div key={p.id_producto} className={styles.topMesCard}>
+                                <span className={styles.topMesRank}>#{i + 1}</span>
+                                <span className={styles.topMesNombre}>{p.nombre}</span>
+                                <span className={styles.topMesUnidades}>{p.unidades_vendidas} uds.</span>
+                                <span className={styles.topMesIngresos}>Q{p.ingresos.toFixed(2)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <table className={styles.table}>
                 <thead>
@@ -165,6 +211,13 @@ function Inventario() {
                     ))}
                 </tbody>
             </table>
+
+            {mostrarCrearModal && (
+                <CrearProductoModal
+                    onClose={() => setMostrarCrearModal(false)}
+                    onCrear={handleCrear}
+                />
+            )}
 
             {confirmarId && (
                 <ConfirmModal

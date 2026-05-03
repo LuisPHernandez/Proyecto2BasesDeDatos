@@ -20,6 +20,7 @@
     gap: 8px;
 }
 
+.createButton,
 .filterButton {
     padding: 9px 14px;
     border: none;

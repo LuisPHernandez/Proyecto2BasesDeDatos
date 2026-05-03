@@ -15,6 +15,15 @@
     margin: 0;
 }
 
+.actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.exportButton,
 .createButton {
     padding: 9px 14px;
     border: none;
@@ -23,6 +32,19 @@
     color: white;
     font-size: 0.9rem;
     cursor: pointer;
+}
+
+.exportButton {
+    background: #006400;
+}
+
+.exportButton:hover {
+    background: #00F700;
+}
+
+.exportButton:disabled {
+    background: #7A7A7A;
+    cursor: not-allowed;
 }
 
 .createButton:hover {
@@ -89,4 +111,17 @@
 
 .cancelButton:hover {
     background: #444;
+}
+
+@media (max-width: 720px) {
+    .header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .actions,
+    .exportButton,
+    .createButton {
+        width: 100%;
+    }
 }

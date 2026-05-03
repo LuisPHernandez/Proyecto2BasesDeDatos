@@ -38,6 +38,24 @@ def get_low_stock():
             detail="Error de base de datos al obtener los productos con bajo stock"
         )
 
+def get_top_mes():
+    """
+    Obtiene los productos más vendidos del mes.
+
+    Returns:
+        list: Lista de productos con unidades vendidas e ingresos.
+
+    Raises:
+        HTTPException: Si ocurre un error en la base de datos (500).
+    """
+    try:
+        return repo.get_top_mes()
+    except DatabaseError:
+        raise HTTPException(
+            status_code=500,
+            detail="Error de base de datos al obtener los productos más vendidos"
+        )
+
 def get_by_id(id: int):
     """
     Obtiene un producto por su ID.

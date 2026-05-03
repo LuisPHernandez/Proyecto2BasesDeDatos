@@ -44,7 +44,7 @@ CREATE TABLE venta (
     id_venta INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_empleado INTEGER NOT NULL,
     id_cliente INTEGER NOT NULL,
-    fecha DATE NOT NULL,
+    fecha TIMESTAMP NOT NULL,
     total DECIMAL(10,2) NOT NULL,
 
     CONSTRAINT fk_venta_empleado

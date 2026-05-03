@@ -54,6 +54,81 @@
     background: #fafafa;
 }
 
+.topMes {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    text-align: left;
+}
+
+.topMesTitle {
+    background: #222;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    padding: 12px 14px;
+}
+
+.topMesGrid {
+    display: grid;
+}
+
+.topMesHeader,
+.topMesCard {
+    display: grid;
+    grid-template-columns: 70px minmax(0, 1fr) 120px 120px;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+}
+
+.topMesHeader {
+    background: #fafafa;
+    border-bottom: 2px solid #e5e7eb;
+    color: #3D3D3D;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.topMesCard {
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+}
+
+.topMesCard:last-child {
+    border-bottom: none;
+}
+
+.topMesRank {
+    font-weight: 600;
+    color: #850000;
+    font-size: 0.9rem;
+}
+
+.topMesNombre {
+    font-size: 0.95rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.topMesUnidades {
+    font-size: 0.9rem;
+    color: #333;
+    text-align: right;
+}
+
+.topMesIngresos {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: right;
+}
+
 .inlineInput {
     width: 100%;
     padding: 4px 8px;
@@ -96,4 +171,29 @@
     margin-left: 8px;
     color: #b45309;
     font-weight: 600;
+}
+
+@media (max-width: 720px) {
+    .topMesHeader {
+        display: none;
+    }
+
+    .topMesCard {
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 6px 12px;
+    }
+
+    .topMesNombre {
+        grid-column: 2;
+    }
+
+    .topMesUnidades {
+        grid-column: 2;
+        text-align: left;
+    }
+
+    .topMesIngresos {
+        grid-column: 2;
+        text-align: left;
+    }
 }

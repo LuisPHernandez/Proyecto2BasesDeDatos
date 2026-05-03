@@ -7,7 +7,10 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
-      - ./db/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
+      - ./db/01-ddl.sql:/docker-entrypoint-initdb.d/01-ddl.sql
+      - ./db/02-indexes.sql:/docker-entrypoint-initdb.d/02-indexes.sql
+      - ./db/03-views.sql:/docker-entrypoint-initdb.d/03-views.sql
+      - ./db/04-data.sql:/docker-entrypoint-initdb.d/04-data.sql
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5555:5432"

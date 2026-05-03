@@ -6,32 +6,6 @@ from datetime import datetime
 
 router = APIRouter()
 
-class VentaBase(BaseModel):
-    """
-    Modelo base que se recibe en una creación de ventas.
-
-    Attributes:
-        id_cliente (int): ID del cliente.
-        id_empleado (int): ID del empleado.
-        fecha (datetime): Fecha de la venta.
-        total (float): Total de la venta.
-    """
-    id_cliente: int
-    id_empleado: int
-    fecha: datetime
-    total: float
-
-class Venta(VentaBase):
-    """
-    Modelo base que se devuelve después de crear una venta.
-
-    Extiende de VentaBase.
-
-    Attributes:
-        id_venta (int): ID de la venta.
-    """
-    id_venta: int
-
 class VentaSummary(BaseModel):
     """
     Modelo que se devuelve para tabla de ventas.
@@ -65,6 +39,34 @@ class VentaProducto(BaseModel):
     nombre_producto: str
     precio_unitario: float
     cantidad: int
+
+class DetalleVentaInput(BaseModel):
+    """
+    Modelo base para los productos que se reciben en una creación de ventas.
+
+    Attributes:
+        id_producto (int): ID del producto.
+        cantidad (int): Cantidad del producto.
+        precio_unitario (float): Precio unitario del producto.
+    """
+    id_producto: int
+    cantidad: int
+    precio_unitario: float
+
+class VentaCreateInput(BaseModel):
+    """
+    Modelo base que se recibe en una creación de ventas.
+
+    Attributes:
+        id_cliente (int): ID del cliente.
+        id_empleado (int): ID del empleado.
+        fecha (datetime): Fecha de la venta.
+        productos (List[DetalleVentaInput]): Lista de productos de la venta.
+    """
+    id_cliente: int
+    id_empleado: int
+    fecha: datetime
+    productos: List[DetalleVentaInput]
 
 @router.get(
     "/",
@@ -137,15 +139,15 @@ def get_productos_by_id(id: int):
     "/",
     status_code=201,
     response_model=VentaSummary,
-    summary="Crear una venta",
-    description="Crea una nueva venta."
+    summary="Crear una venta con sus productos",
+    description="Crea una nueva venta con todos sus productos en una transacción."
 )
-def create(v: VentaBase):
+def create(v: VentaCreateInput):
     """
     Crea una nueva venta.
 
     Args:
-        venta (VentaBase): Venta a crear.
+        venta (VentaCreateInput): Venta a crear.
 
     Returns:
         VentaSummary: Venta creada.
@@ -153,7 +155,7 @@ def create(v: VentaBase):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.create(v.id_cliente, v.id_empleado, v.fecha, v.total)
+    return service.create(v.id_cliente, v.id_empleado, v.fecha, v.productos)
 
 @router.delete(
     "/{id}",

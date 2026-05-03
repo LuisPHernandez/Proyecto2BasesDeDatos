@@ -71,7 +71,7 @@ def get_productos_by_id(id: int):
             detail="Error de base de datos al obtener los productos de la venta"
         )
 
-def create(id_cliente: int, id_empleado: int, fecha: datetime, total: float):
+def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list):
     """
     Crea una nueva venta.
 
@@ -79,7 +79,7 @@ def create(id_cliente: int, id_empleado: int, fecha: datetime, total: float):
         id_cliente (int): ID del cliente.
         id_empleado (int): ID del empleado.
         fecha (datetime): Fecha de la venta.
-        total (float): Total de la venta.
+        productos (list): Lista de productos de la venta.
 
     Returns:
         dict: Venta creada con su ID asignado.
@@ -88,12 +88,11 @@ def create(id_cliente: int, id_empleado: int, fecha: datetime, total: float):
         HTTPException: Si ocurre un error en la creación (500).
     """
     try:
-        return repo.create(id_cliente, id_empleado, fecha, total)
+        return repo.create(id_cliente, id_empleado, fecha, [producto.dict() for producto in productos])
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except DatabaseError:
-        raise HTTPException(
-            status_code=500,
-            detail="Error de base de datos al crear la venta"
-        )
+        raise HTTPException(status_code=500, detail="Error de base de datos al crear la venta")
 
 def delete(id: int):
     """

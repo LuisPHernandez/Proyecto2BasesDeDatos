@@ -5,18 +5,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 16px;
     z-index: 999;
+    box-sizing: border-box;
 }
 
 .modal {
     background: white;
     border-radius: 10px;
-    padding: 2rem;
-    width: 100%;
-    max-width: 440px;
+    padding: 24px;
+    width: min(720px, 100%);
+    max-height: calc(100vh - 32px);
     display: flex;
     flex-direction: column;
     gap: 16px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .modalHeader {
@@ -30,6 +34,7 @@
     font-size: 1.1rem;
     font-weight: 600;
     color: #333;
+    overflow-wrap: anywhere;
 }
 
 .closeButton {
@@ -56,14 +61,20 @@
     color: black;
 }
 
-.field input {
+.field input,
+.field select {
+    width: 100%;
     padding: 8px 10px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
     font-size: 0.95rem;
+    box-sizing: border-box;
+    background: white;
+    color: #333;
 }
 
-.field input:focus {
+.field input:focus,
+.field select:focus {
     outline: none;
     border-color: #222;
 }
@@ -101,4 +112,10 @@
 
 .submitButton:hover {
     background: #7A7A7A;
+}
+
+@media (max-width: 560px) {
+    .modal {
+        padding: 16px;
+    }
 }

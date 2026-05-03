@@ -17,6 +17,13 @@ export interface ProductoDetailed extends Producto {
     categoria: string
 }
 
+export interface ProductoTop {
+    id_producto: number
+    nombre: string
+    unidades_vendidas: number
+    ingresos: number
+}
+
 // ---------------------------- Ventas ---------------------------- 
 export interface VentaBase {
     id_cliente: number
@@ -43,6 +50,19 @@ export interface VentaProducto {
     nombre_producto: string
     precio_unitario: number
     cantidad: number
+}
+
+export interface DetalleVentaInput {
+    id_producto: number
+    cantidad: number
+    precio_unitario: number
+}
+
+export interface VentaCreateInput {
+    id_cliente: number
+    id_empleado: number
+    fecha: string
+    productos: DetalleVentaInput[]
 }
 
 // ---------------------------- Proveedores ----------------------------

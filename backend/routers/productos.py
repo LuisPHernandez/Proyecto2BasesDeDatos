@@ -49,6 +49,21 @@ class ProductoDetailed(Producto):
     proveedor: str
     categoria: str
 
+class ProductoTop(BaseModel):
+    """
+    Modelo de producto más vendido.
+
+    Atributos:
+        id_producto (int): Identificador único del producto.
+        nombre (str): Nombre del producto.
+        unidades_vendidas (int): Cantidad de unidades vendidas.
+        ingresos (float): Ingresos generados por el producto.
+    """
+    id_producto: int
+    nombre: str
+    unidades_vendidas: int
+    ingresos: float
+
 @router.get(
     "/",
     status_code=200,
@@ -84,6 +99,23 @@ def get_low_stock():
         HTTPException: Si ocurre un error interno (500).
     """
     return service.get_low_stock()
+
+@router.get(
+    "/top-mes",
+    status_code=200,
+    response_model=List[ProductoTop],
+    summary="Top 5 productos más vendidos del mes",
+    description="Devuelve los 5 productos más vendidos del mes actual usando CTE."
+)
+def get_top_mes():
+    """
+    Returns:
+        List[ProductoTop]: Top 5 productos del mes.
+
+    Raises:
+        HTTPException: Si ocurre un error interno (500).
+    """
+    return service.get_top_mes()
 
 @router.get(
     "/{id}",

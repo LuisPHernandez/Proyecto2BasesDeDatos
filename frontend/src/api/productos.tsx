@@ -1,4 +1,4 @@
-import type { ProductoBase } from "../types"
+import type { ProductoBase, ProductoTop } from "../types"
 
 const BASE = '/api/productos/'
 
@@ -17,6 +17,12 @@ export async function getLowStockIds() {
 export async function getProductoById(id: number) {
     const res = await fetch(`${BASE}${id}`)
     if (!res.ok) throw new Error('Error al obtener producto')
+    return res.json()
+}
+
+export async function getTopMes(): Promise<ProductoTop[]> {
+    const res = await fetch(`${BASE}top-mes`)
+    if (!res.ok) throw new Error('Error al obtener top productos')
     return res.json()
 }
 

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { deleteVenta, getVentas } from '../../api/ventas'
+import { createVenta, deleteVenta, getVentas } from '../../api/ventas'
 import ActionsMenu from '../../components/ActionsMenu/ActionsMenu'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
-import type { VentaSummary } from '../../types'
+import CrearVentaModal from '../../components/CrearVentaModal/CrearVentaModal'
+import type { VentaCreateInput, VentaSummary } from '../../types'
 import { getRango, type RangoFecha } from '../../utils/fechas'
 import styles from './Ventas.module.css'
 
@@ -20,6 +21,7 @@ function Ventas() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [confirmarId, setConfirmarId] = useState<number | null>(null)
+    const [mostrarCrear, setMostrarCrear] = useState(false)
 
     useEffect(() => {
         const load = async () => {
@@ -36,6 +38,12 @@ function Ventas() {
         }
         load()
     }, [rango])
+
+    const handleCrear = async (data: VentaCreateInput) => {
+        const nueva = await createVenta(data)
+        setVentas(prev => [nueva, ...prev])
+        return nueva
+    }
 
     const handleEliminar = async () => {
         if (!confirmarId) return
@@ -73,6 +81,9 @@ function Ventas() {
                             {r.label}
                         </button>
                     ))}
+                    <button className={styles.createButton} onClick={() => setMostrarCrear(true)}>
+                        + Nueva venta
+                    </button>
                 </div>
             </div>
 
@@ -110,6 +121,13 @@ function Ventas() {
                         ))}
                     </tbody>
                 </table>
+            )}
+
+            {mostrarCrear && (
+                <CrearVentaModal
+                    onClose={() => setMostrarCrear(false)}
+                    onCrear={handleCrear}
+                />
             )}
 
             {confirmarId && (

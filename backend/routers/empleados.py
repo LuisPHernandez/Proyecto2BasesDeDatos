@@ -25,19 +25,32 @@ class Empleado(EmpleadoBase):
     """
     id_empleado: int
 
+class EmpleadoSales(Empleado):
+    """
+    Modelo con identificador que se devuelve al obtener empleados con ventas.
+
+    Extiende Empleado.
+
+    Attributes:
+        ventas (int): Número total de ventas realizadas por el empleado.
+        ingresos (float): Total de ingresos generados por el empleado.
+    """
+    ventas: int
+    ingresos: float
+
 @router.get(
     "/",
     status_code=200,
-    response_model=List[Empleado],
+    response_model=List[EmpleadoSales],
     summary="Obtener todos los empleados",
-    description="Devuelve una lista de todos los empleados disponibles."
+    description="Devuelve una lista de todos los empleados disponibles y su total de ventas e ingresos generado."
 )
 def get_all():
     """
     Obtiene todos los empleados.
 
     Returns:
-        List[Empleado]: Lista de empleados.
+        List[EmpleadoSales]: Lista de empleados con sus ventas e ingresos generados.
 
     Raises:
         HTTPException: Si ocurre un error interno (500).

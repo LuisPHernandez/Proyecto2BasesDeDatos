@@ -3,11 +3,11 @@ import { createEmpleado, deleteEmpleado, getEmpleados, updateEmpleado } from '..
 import ActionsMenu from '../../components/ActionsMenu/ActionsMenu'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import CrearEmpleadoModal from '../../components/Modal/CrearEmpleadoModal'
-import type { Empleado, EmpleadoBase } from '../../types'
+import type { Empleado, EmpleadoBase, EmpleadoSales } from '../../types'
 import styles from './Empleados.module.css'
 
 function Empleados() {
-    const [empleados, setEmpleados] = useState<Empleado[]>([])
+    const [empleados, setEmpleados] = useState<EmpleadoSales[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [editandoId, setEditandoId] = useState<number | null>(null)
@@ -76,6 +76,8 @@ function Empleados() {
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
+                        <th>Total de ventas</th>
+                        <th>Ingresos generados</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -92,6 +94,8 @@ function Empleados() {
                                             onChange={e => setEditForm(f => ({ ...f, nombre: e.target.value }))}
                                         />
                                     </td>
+                                    <td>{p.ventas}</td>
+                                    <td>{p.ingresos}</td>
                                     <td>
                                         <button className={styles.saveButton} onClick={() => handleGuardar(p)}>Guardar</button>
                                         <button className={styles.cancelButton} onClick={() => setEditandoId(null)}>Cancelar</button>
@@ -101,6 +105,8 @@ function Empleados() {
                                 <>
                                     <td>{p.id_empleado}</td>
                                     <td>{p.nombre}</td>
+                                    <td>{p.ventas}</td>
+                                    <td>{p.ingresos}</td>
                                     <td>
                                         <ActionsMenu
                                             onEditar={() => handleEditar(p)}

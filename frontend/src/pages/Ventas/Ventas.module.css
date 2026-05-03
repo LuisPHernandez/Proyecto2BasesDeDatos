@@ -59,7 +59,7 @@
     font-weight: 400;
 }
 
-.table tr:hover td {
+.table tbody tr:hover {
     background: #fafafa;
     cursor: pointer;
 }

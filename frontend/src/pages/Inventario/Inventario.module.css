@@ -50,7 +50,7 @@
     font-weight: 400;
 }
 
-.table tr:hover {
+.table tbody tr:hover {
     background: #fafafa;
 }
 

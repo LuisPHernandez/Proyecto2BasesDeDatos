@@ -77,6 +77,11 @@ export interface Empleado extends EmpleadoBase {
     id_empleado: number
 }
 
+export interface EmpleadoSales extends Empleado {
+    ventas: number
+    ingresos: number
+}
+
 // ---------------------------- Categorias ----------------------------
 
 export interface CategoriaBase {

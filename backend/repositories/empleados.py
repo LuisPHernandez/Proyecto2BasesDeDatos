@@ -17,7 +17,14 @@ def get_all():
     try:
         conn = get_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT * FROM empleado ORDER BY id_empleado")
+        cur.execute("""
+            SELECT e.id_empleado, e.nombre, COUNT(v.id_venta) AS ventas, SUM(v.total) AS ingresos
+            FROM empleado e
+            JOIN venta v ON e.id_empleado = v.id_empleado
+            GROUP BY e.id_empleado, e.nombre
+            HAVING COUNT(v.id_venta) > 1
+            ORDER BY ingresos DESC
+        """)
         return cur.fetchall()
     except DatabaseError as e:
         print(f"Error de base de datos en get_all empleado: {e}")

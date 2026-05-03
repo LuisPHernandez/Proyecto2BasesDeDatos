@@ -87,6 +87,10 @@ function Clientes() {
                 </button>
             </div>
 
+            {activeFilter && (
+                <h2>Mostrando solo clientes que hayan realizado alguna compra en el últmo mes</h2>
+            )}
+
             <table className={styles.table}>
                 <thead>
                     <tr>

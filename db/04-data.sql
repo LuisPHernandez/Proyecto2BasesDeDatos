@@ -77,7 +77,7 @@ INSERT INTO empleado (id_empleado, nombre) OVERRIDING SYSTEM VALUE VALUES
 (17,'Manuel Cifuentes'),
 (18,'Lucía Barrios'),
 (19,'Oscar Aguilar'),
-(20,'Daniela Reyes');
+(20,'Daniela Reyes'),
 (21, 'Carlos Méndez'),
 (22, 'Ana López'),
 (23, 'Luis García'),

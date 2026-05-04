@@ -132,7 +132,7 @@ function Proveedores() {
 
             {confirmarId && (
                 <ConfirmModal
-                    mensaje={`¿Eliminar "${proveedores.find(p => p.id_proveedor === confirmarId)?.nombre}"?`}
+                    mensaje={`Eliminar "${proveedores.find(p => p.id_proveedor === confirmarId)?.nombre}"?\n\nTambien se borraran todos sus productos asociados y los detalles de venta donde aparezcan esos productos. Las ventas quedaran registradas, pero sin esos productos en su detalle.`}
                     onConfirm={handleEliminar}
                     onCancel={() => setConfirmarId(null)}
                 />

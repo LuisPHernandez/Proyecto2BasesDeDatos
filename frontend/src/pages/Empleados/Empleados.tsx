@@ -166,7 +166,7 @@ function Empleados() {
 
             {confirmarId && (
                 <ConfirmModal
-                    mensaje={`¿Eliminar "${empleados.find(p => p.id_empleado === confirmarId)?.nombre}"?`}
+                    mensaje={`Eliminar "${empleados.find(p => p.id_empleado === confirmarId)?.nombre}"?\n\nTambien se borraran todas las ventas atendidas por este empleado y todos los detalles asociados a esas ventas.`}
                     onConfirm={handleEliminar}
                     onCancel={() => setConfirmarId(null)}
                 />

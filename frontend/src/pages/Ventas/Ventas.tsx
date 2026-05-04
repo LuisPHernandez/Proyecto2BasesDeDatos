@@ -132,7 +132,7 @@ function Ventas() {
 
             {confirmarId && (
                 <ConfirmModal
-                    mensaje={`¿Eliminar venta #${confirmarId}?\n\nATENCION: Esta accion eliminara todos los detalles de venta asociados a esta venta.`}
+                    mensaje={`Eliminar venta #${confirmarId}?\n\nTambien se borraran todos los detalles de producto asociados a esta venta.`}
                     onConfirm={handleEliminar}
                     onCancel={() => setConfirmarId(null)}
                 />

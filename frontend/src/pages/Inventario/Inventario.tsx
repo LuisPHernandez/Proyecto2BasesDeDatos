@@ -221,7 +221,7 @@ function Inventario() {
 
             {confirmarId && (
                 <ConfirmModal
-                    mensaje={`¿Eliminar "${productos.find(p => p.id_producto === confirmarId)?.nombre}"?\n\nATENCION: Esta accion eliminara todos los detalles de venta en los que aparezca este producto.`}
+                    mensaje={`Eliminar "${productos.find(p => p.id_producto === confirmarId)?.nombre}"?\n\nTambien se borraran todos los detalles de venta donde aparezca este producto. Las ventas quedaran registradas, pero sin este producto en su detalle.`}
                     onConfirm={handleEliminar}
                     onCancel={() => setConfirmarId(null)}
                 />

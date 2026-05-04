@@ -125,7 +125,7 @@ function VentaDetalle() {
 
             {confirmar && (
                 <ConfirmModal
-                    mensaje={`¿Eliminar venta #${venta.id_venta}?\n\nEsta acción no se puede deshacer.`}
+                    mensaje={`Eliminar venta #${venta.id_venta}?\n\nTambien se borraran todos los detalles de producto asociados a esta venta.`}
                     onConfirm={handleEliminar}
                     onCancel={() => setConfirmar(false)}
                 />

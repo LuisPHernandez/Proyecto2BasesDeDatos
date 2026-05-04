@@ -152,7 +152,7 @@ function Clientes() {
 
             {confirmarId && (
                 <ConfirmModal
-                    mensaje={`¿Eliminar "${clientes.find(c => c.id_cliente === confirmarId)?.nombre}"?`}
+                    mensaje={`Eliminar "${clientes.find(c => c.id_cliente === confirmarId)?.nombre}"?\n\nTambien se borraran todas las ventas de este cliente y todos los detalles asociados a esas ventas.`}
                     onConfirm={handleEliminar}
                     onCancel={() => setConfirmarId(null)}
                 />

@@ -22,11 +22,13 @@ CREATE TABLE producto (
 
     CONSTRAINT fk_producto_proveedor
         FOREIGN KEY (id_proveedor)
-        REFERENCES proveedor(id_proveedor),
+        REFERENCES proveedor(id_proveedor)
+        ON DELETE CASCADE,
     
     CONSTRAINT fk_producto_categoria
         FOREIGN KEY (id_categoria)
         REFERENCES categoria(id_categoria)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE empleado (
@@ -49,11 +51,13 @@ CREATE TABLE venta (
 
     CONSTRAINT fk_venta_empleado
         FOREIGN KEY (id_empleado)
-        REFERENCES empleado(id_empleado),
+        REFERENCES empleado(id_empleado)
+        ON DELETE CASCADE,
 
     CONSTRAINT fk_venta_cliente
         FOREIGN KEY (id_cliente)
         REFERENCES cliente(id_cliente)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE detalle_venta (
@@ -66,9 +70,11 @@ CREATE TABLE detalle_venta (
 
     CONSTRAINT fk_detalle_venta_venta
         FOREIGN KEY (id_venta)
-        REFERENCES venta(id_venta),
+        REFERENCES venta(id_venta)
+        ON DELETE CASCADE,
 
     CONSTRAINT fk_detalle_venta_producto
         FOREIGN KEY (id_producto)
         REFERENCES producto(id_producto)
+        ON DELETE CASCADE
 );

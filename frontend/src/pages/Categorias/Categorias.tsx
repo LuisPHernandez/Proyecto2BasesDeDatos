@@ -146,7 +146,7 @@ function Categorias() {
 
             {confirmarId && (
                 <ConfirmModal
-                    mensaje={`¿Eliminar "${categorias.find(p => p.id_categoria === confirmarId)?.nombre}"?`}
+                    mensaje={`Eliminar "${categorias.find(p => p.id_categoria === confirmarId)?.nombre}"?\n\nTambien se borraran todos los productos de esta categoria y los detalles de venta donde aparezcan esos productos. Las ventas quedaran registradas, pero sin esos productos en su detalle.`}
                     onConfirm={handleEliminar}
                     onCancel={() => setConfirmarId(null)}
                 />

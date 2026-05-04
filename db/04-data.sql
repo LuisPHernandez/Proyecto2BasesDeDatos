@@ -22,12 +22,11 @@ INSERT INTO proveedor (id_proveedor, nombre, email) OVERRIDING SYSTEM VALUE VALU
 (18,'Huevos La Granja','huevoslagranja@proveedores.com'),
 (19,'Pastas Roma','pastasroma@proveedores.com'),
 (20,'FarmaciaCentral','farmaciacentral@proveedores.com'),
-(21, 'Distribuidora del Sur', 'distribuidoradelsur@proveedores.com'),
+(21, 'Distribuidora San Patruko', 'distribuidorasanpatruko@proveedores.com'),
 (22, 'Importadora Central', 'importadoracentral@proveedores.com'),
-(23, 'Congelados del Norte', 'congeladosdelnorte@proveedores.com'),
-(24, 'Huevos La Granja', 'huevoslagranja@proveedores.com'),
-(25, 'Pastas Roma', 'pastasroma@proveedores.com'),
-(26, 'FarmaciaCentral', 'farmaciacentral@proveedores.com');
+(23, 'Distribuidora Mariscal', 'distribuidoramariscal@proveedores.com'),
+(24, 'Distribuidora del País', 'distribuidoradelpais@proveedores.com'),
+(25, 'Importadora Yeye', 'importadorayeye@proveedores.com');
 
 -- CATEGORIA
 INSERT INTO categoria (id_categoria, nombre) OVERRIDING SYSTEM VALUE VALUES

@@ -18,6 +18,23 @@ function CrearClienteModal({ onClose, onCrear }: Props) {
             setError('Todos los campos son requeridos')
             return
         }
+        if (form.nombre.trim().length > 30) {
+            setError('El nombre del cliente no puede exceder los 30 caracteres')
+            return
+        }
+        if (form.email.trim().length > 30) {
+            setError('El email del cliente no puede exceder los 30 caracteres')
+            return
+        }
+        if (!form.email.trim().includes('@')) {
+            setError('El email del cliente debe contener un @')
+            return
+        }
+        if (form.email.trim().includes(' ')) {
+            setError('El email del cliente no puede contener espacios')
+            return
+        }
+
         setLoading(true)
         try {
             await onCrear(form)

@@ -18,6 +18,31 @@ function CrearProveedorModal({ onClose, onCrear }: Props) {
             setError('Todos los campos son requeridos')
             return
         }
+        if (form.nombre.length > 30) {
+            setError('El nombre del proveedor no puede exceder los 30 caracteres')
+            return
+        }
+        if (form.nombre.length < 2) {
+            setError('El nombre del proveedor debe tener al menos 2 caracteres')
+            return
+        }
+        if (form.email.length > 30) {
+            setError('El email del proveedor no puede exceder los 30 caracteres')
+            return
+        }
+        if (form.email.length < 3) {
+            setError('El email del proveedor debe tener al menos 3 caracteres')
+            return
+        }
+        if (!form.email.includes('@')) {
+            setError('El email del proveedor debe contener un @')
+            return
+        }
+        if (form.email.trim().includes(' ')) {
+            setError('El email del proveedor no puede contener espacios')
+            return
+        }
+
         setLoading(true)
         try {
             await onCrear(form)

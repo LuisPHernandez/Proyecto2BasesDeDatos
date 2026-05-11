@@ -49,12 +49,28 @@ function CrearProductoModal({ onClose, onCrear }: Props) {
             setError('Ingresa el nombre del producto')
             return
         }
+        if (form.nombre.length > 30) {
+            setError('El nombre del producto no puede exceder los 30 caracteres')
+            return
+        }
+        if (form.nombre.length < 2) {
+            setError('El nombre del producto debe tener al menos 2 caracteres')
+            return
+        }
         if (!form.id_proveedor || !form.id_categoria) {
             setError('Selecciona proveedor y categoria')
             return
         }
         if (form.precio_compra < 0 || form.precio_venta < 0 || form.unidades_disponibles < 0) {
             setError('Los precios y unidades no pueden ser negativos')
+            return
+        }
+        if (form.precio_compra > form.precio_venta) {
+            setError('El precio de compra no puede ser mayor al precio de venta')
+            return
+        }
+        if (form.unidades_disponibles % 1 !== 0) {
+            setError('Las unidades disponibles deben ser numeros enteros')
             return
         }
 

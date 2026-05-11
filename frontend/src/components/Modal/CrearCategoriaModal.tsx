@@ -15,9 +15,18 @@ function CrearCategoriaModal({ onClose, onCrear }: Props) {
 
     const handleSubmit = async () => {
         if (!form.nombre.trim()) {
-            setError('Todos los campos son requeridos')
+            setError('El nombre de la categoría es requerido')
             return
         }
+        if (form.nombre.trim().length > 30) {
+            setError('El nombre de la categoría no puede exceder los 30 caracteres')
+            return
+        }
+        if (form.nombre.trim().length < 2) {
+            setError('El nombre de la categoría debe tener al menos 2 caracteres')
+            return
+        }
+
         setLoading(true)
         try {
             await onCrear(form)

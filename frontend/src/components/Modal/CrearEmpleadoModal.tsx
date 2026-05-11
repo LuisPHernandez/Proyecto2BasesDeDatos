@@ -15,7 +15,15 @@ function CrearEmpleadoModal({ onClose, onCrear }: Props) {
 
     const handleSubmit = async () => {
         if (!form.nombre.trim()) {
-            setError('Todos los campos son requeridos')
+            setError('El campo de nombre es requerido')
+            return
+        }
+        if (form.nombre.length > 30) {
+            setError('El nombre del empleado no puede exceder los 30 caracteres')
+            return
+        }
+        if (form.nombre.length < 2) {
+            setError('El nombre del empleado debe tener al menos 2 caracteres')
             return
         }
         setLoading(true)

@@ -89,6 +89,12 @@ function CrearVentaModal({ onClose, onCrear }: Props) {
             setError('Agrega al menos un producto')
             return
         }
+        for (const item of items) {
+            if (item.cantidad % 1 !== 0) {
+                setError('La cantidad de todos los productos debe ser un número entero')
+                return
+            }
+        }
         setLoading(true)
         setError(null)
         try {

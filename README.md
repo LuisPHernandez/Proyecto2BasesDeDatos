@@ -30,14 +30,14 @@ docker compose up --build
 3. Abrir la aplicacion web:
 
 ```text
-http://localhost:5173/proyecto2
+http://localhost:5173/proyecto2/
 ```
 
 4. Servicios disponibles:
 
-- Frontend: `http://localhost:5173/proyecto2`
-- Backend/API: `http://localhost:8000`
-- Documentacion de FastAPI: `http://localhost:8000/docs`
+- Frontend: `http://localhost:5173/proyecto2/`
+- Backend/API: `http://localhost:8867/`
+- Documentacion de FastAPI: `http://localhost:8867/docs`
 - PostgreSQL expuesto localmente en el puerto `5555`
 
 Para reiniciar desde cero la base de datos con los scripts iniciales:

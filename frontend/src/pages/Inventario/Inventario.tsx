@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { getCategorias } from '../../api/categorias'
 import { createProducto, deleteProducto, getLowStockIds, getProductos, getTopMes, updateProducto } from '../../api/productos'
 import { getProveedores } from '../../api/proveedores'
@@ -40,6 +40,11 @@ function Inventario() {
         }
         load()
     }, [])
+
+    const lowStockIdSet = useMemo(
+        () => new Set(lowStockIds),
+        [lowStockIds]
+    )
 
     const handleEditar = (p: Producto) => {
         setEditandoId(p.id_producto)
@@ -88,9 +93,12 @@ function Inventario() {
     if (loading) return <p>Cargando...</p>
     if (error) return <p>Error: {error}</p>
 
-    const productosMostrados = lowStockFilter
-        ? productos.filter(p => lowStockIds.includes(p.id_producto))
-        : productos
+    const productosMostrados = useMemo(
+        () => lowStockFilter
+            ? productos.filter(p => lowStockIdSet.has(p.id_producto))
+            : productos,
+        [lowStockFilter, productos, lowStockIdSet]
+    )
 
     return (
         <div className={styles.container}>
@@ -180,7 +188,7 @@ function Inventario() {
                                             value={editForm.unidades_disponibles ?? ''}
                                             onChange={e => setEditForm(f => ({ ...f, unidades_disponibles: +e.target.value }))}
                                         />
-                                        <StockBadge show={lowStockIds.includes(p.id_producto)} />
+                                        <StockBadge show={lowStockIdSet.has(p.id_producto)} />
                                     </td>
                                     <td>
                                         <button className={styles.saveButton} onClick={() => handleGuardar(p)}>Guardar</button>
@@ -197,7 +205,7 @@ function Inventario() {
                                     <td>{p.precio_venta}</td>
                                     <td>
                                         {p.unidades_disponibles}
-                                        <StockBadge show={lowStockIds.includes(p.id_producto)} />
+                                        <StockBadge show={lowStockIdSet.has(p.id_producto)} />
                                     </td>
                                     <td>
                                         <ActionsMenu

@@ -58,6 +58,7 @@ Credenciales de acceso:
 ```text
 Usuario: admin
 Contraseña: admin123
+```
 
 ## Estructura del proyecto
 
@@ -83,6 +84,15 @@ Contraseña: admin123
 +-- docker-compose.yml
 +-- .env.example
 +-- README.md
+```
+
+## Uso del linter
+
+Para correr ESLint, entrar a la carpeta del frontend y ejecutar:
+
+```bash
+cd frontend
+npm run lint
 ```
 
 ## Dominio del sistema

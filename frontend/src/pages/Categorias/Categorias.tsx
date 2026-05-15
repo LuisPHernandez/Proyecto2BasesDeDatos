@@ -22,8 +22,8 @@ function Categorias() {
             try {
                 const data = await getCategorias()
                 setCategorias(data)
-            } catch (e: any) {
-                setError(e.message)
+            } catch (e) {
+                setError(e instanceof Error ? e.message : 'Ocurrió un error')
             } finally {
                 setLoading(false)
             }
@@ -36,8 +36,8 @@ function Categorias() {
             try {
                 const data = await getCategoriasWithIncome()
                 setCategoriasIncome(data)
-            } catch (e: any) {
-                setError(e.message)
+            } catch (e) {
+                setError(e instanceof Error ? e.message : 'Ocurrió un error')
                 return
             }
         }
@@ -67,8 +67,8 @@ function Categorias() {
         try {
             await deleteCategoria(confirmarId)
             setCategorias(prev => prev.filter(p => p.id_categoria !== confirmarId))
-        } catch (e: any) {
-            setError(e.message)
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Ocurrió un error')
         } finally {
             setConfirmarId(null)
         }

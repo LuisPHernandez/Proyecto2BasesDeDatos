@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useMemo, useState } from 'react'
 
 interface AuthUser {
     username: string
@@ -17,14 +17,10 @@ const STORAGE_KEY = 'tienda-auth-user'
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<AuthUser | null>(null)
-
-    useEffect(() => {
+    const [user, setUser] = useState<AuthUser | null>(() => {
         const savedUser = localStorage.getItem(STORAGE_KEY)
-        if (savedUser) {
-            setUser(JSON.parse(savedUser))
-        }
-    }, [])
+        return savedUser ? JSON.parse(savedUser) : null
+    })
 
     const login = (username: string, password: string) => {
         if (username.trim() !== 'admin' || password !== 'admin123') {
@@ -63,15 +59,4 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     )
 }
 
-function useAuth() {
-    const context = useContext(AuthContext)
-
-    if (!context) {
-        throw new Error('useAuth debe usarse dentro de AuthProvider')
-    }
-
-    return context
-}
-
-export { AuthProvider, useAuth }
-
+export { AuthContext, AuthProvider }

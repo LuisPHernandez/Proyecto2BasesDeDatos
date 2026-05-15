@@ -1,6 +1,6 @@
 import { type SyntheticEvent, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '../../context/useAuth'
 import styles from './Login.module.css'
 
 function Login() {

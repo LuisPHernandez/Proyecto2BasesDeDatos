@@ -25,8 +25,8 @@ function VentaDetalle() {
                 ])
                 setVenta(ventaData)
                 setProductos(productosData)
-            } catch (e: any) {
-                setError(e.message)
+            } catch (e) {
+                setError(e instanceof Error ? e.message : 'Ocurrió un error')
             } finally {
                 setLoading(false)
             }

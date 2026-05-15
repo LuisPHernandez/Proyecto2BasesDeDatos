@@ -31,8 +31,8 @@ function CrearCategoriaModal({ onClose, onCrear }: Props) {
         try {
             await onCrear(form)
             onClose()
-        } catch (e: any) {
-            setError(e.message)
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Ocurrió un error')
         } finally {
             setLoading(false)
         }

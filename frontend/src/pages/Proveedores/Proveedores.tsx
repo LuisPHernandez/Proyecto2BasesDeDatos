@@ -20,8 +20,8 @@ function Proveedores() {
             try {
                 const data = await getProveedores()
                 setProveedores(data)
-            } catch (e: any) {
-                setError(e.message)
+            } catch (e) {
+                setError(e instanceof Error ? e.message : 'Ocurrió un error')
             } finally {
                 setLoading(false)
             }
@@ -52,8 +52,8 @@ function Proveedores() {
         try {
             await deleteProveedor(confirmarId)
             setProveedores(prev => prev.filter(p => p.id_proveedor !== confirmarId))
-        } catch (e: any) {
-            setError(e.message)
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Ocurrió un error')
         } finally {
             setConfirmarId(null)
         }

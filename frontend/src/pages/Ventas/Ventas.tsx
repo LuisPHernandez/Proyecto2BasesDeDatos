@@ -30,8 +30,8 @@ function Ventas() {
                 const { inicio, fin } = getRango(rango)
                 const data = await getVentas(inicio, fin)
                 setVentas(data)
-            } catch (e: any) {
-                setError(e.message)
+            } catch (e) {
+                setError(e instanceof Error ? e.message : 'Ocurrió un error')
             } finally {
                 setLoading(false)
             }

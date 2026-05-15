@@ -2,6 +2,9 @@
 
 Aplicacion web para gestionar el inventario y las ventas de una tienda. El sistema incluye frontend, backend y base de datos relacional en PostgreSQL, levantados con Docker Compose.
 
+Servidor remoto con el frontend: http://34.51.81.158/proyecto2/
+Servidor remoto con el backend: http://34.51.81.158:8867/
+
 ## Tecnologias
 
 - Frontend: React, TypeScript y Vite.

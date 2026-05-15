@@ -35,7 +35,7 @@ function CrearProductoModal({ onClose, onCrear }: Props) {
                 setProveedores(proveedoresData)
                 setCategorias(categoriasData)
             } catch (e) {
-                setError(e instanceof Error ? e.message : 'Ocurrió un error')
+                setError(e instanceof Error ? e.message : 'OcurriÃ³ un error')
             } finally {
                 setLoadingData(false)
             }
@@ -80,7 +80,7 @@ function CrearProductoModal({ onClose, onCrear }: Props) {
             await onCrear(form)
             onClose()
         } catch (e) {
-            setError(e instanceof Error ? e.message : 'Ocurrió un error')
+            setError(e instanceof Error ? e.message : 'OcurriÃ³ un error')
         } finally {
             setLoading(false)
         }

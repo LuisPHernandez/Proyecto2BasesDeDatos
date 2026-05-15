@@ -27,7 +27,7 @@ function Clientes() {
                 setClientes(data)
                 setActiveIds(ids)
             } catch (e) {
-                setError(e instanceof Error ? e.message : 'Ocurrió un error')
+                setError(e instanceof Error ? e.message : 'OcurriÃ³ un error')
             } finally {
                 setLoading(false)
             }
@@ -59,7 +59,7 @@ function Clientes() {
             await deleteCliente(confirmarId)
             setClientes(prev => prev.filter(c => c.id_cliente !== confirmarId))
         } catch (e) {
-            setError(e instanceof Error ? e.message : 'Ocurrió un error')
+            setError(e instanceof Error ? e.message : 'OcurriÃ³ un error')
         } finally {
             setConfirmarId(null)
         }

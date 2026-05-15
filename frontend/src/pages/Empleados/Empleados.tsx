@@ -21,7 +21,7 @@ function Empleados() {
                 const data = await getEmpleados()
                 setEmpleados(data)
             } catch (e) {
-                setError(e instanceof Error ? e.message : 'Ocurrió un error')
+                setError(e instanceof Error ? e.message : 'OcurriÃ³ un error')
             } finally {
                 setLoading(false)
             }
@@ -53,7 +53,7 @@ function Empleados() {
             await deleteEmpleado(confirmarId)
             setEmpleados(prev => prev.filter(p => p.id_empleado !== confirmarId))
         } catch (e) {
-            setError(e instanceof Error ? e.message : 'Ocurrió un error')
+            setError(e instanceof Error ? e.message : 'OcurriÃ³ un error')
         } finally {
             setConfirmarId(null)
         }

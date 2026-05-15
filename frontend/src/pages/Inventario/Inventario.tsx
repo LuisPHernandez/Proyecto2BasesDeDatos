@@ -33,7 +33,7 @@ function Inventario() {
                 setLowStockIds(ids)
                 setTopMes(top)
             } catch (e) {
-                setError(e instanceof Error ? e.message : 'Ocurrió un error')
+                setError(e instanceof Error ? e.message : 'OcurriÃ³ un error')
             } finally {
                 setLoading(false)
             }
@@ -91,7 +91,7 @@ function Inventario() {
                 prev.filter(p => p.id_producto !== confirmarId)
             )
         } catch (e) {
-            setError(e instanceof Error ? e.message : 'Ocurrió un error')
+            setError(e instanceof Error ? e.message : 'OcurriÃ³ un error')
         } finally {
             setConfirmarId(null)
         }

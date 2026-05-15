@@ -13,7 +13,7 @@ import Ventas from "./pages/Ventas/Ventas"
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/proyecto2">
       <Routes>
         <Route path="/login" element={<Login />} />
 

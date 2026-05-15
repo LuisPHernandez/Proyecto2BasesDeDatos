@@ -6,7 +6,7 @@ import ActionsMenu from '../../components/ActionsMenu/ActionsMenu'
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
 import CrearProductoModal from '../../components/Modal/CrearProductoModal'
 import StockBadge from '../../components/StockBadge/StockBadge'
-import type { Producto, ProductoBase, ProductoDetailed, ProductoTop } from '../../types'
+import type { Categoria, Producto, ProductoBase, ProductoDetailed, ProductoTop, Proveedor } from '../../types'
 import styles from './Inventario.module.css'
 
 function Inventario() {
@@ -69,7 +69,7 @@ function Inventario() {
             createProducto(data),
             getProveedores(),
             getCategorias()
-        ])
+        ]) as [Producto, Proveedor[], Categoria[]]
 
         const nuevoProducto: ProductoDetailed = {
             ...producto,

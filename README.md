@@ -30,12 +30,12 @@ docker compose up --build
 3. Abrir la aplicacion web:
 
 ```text
-http://localhost:5173
+http://localhost:5173/proyecto2
 ```
 
 4. Servicios disponibles:
 
-- Frontend: `http://localhost:5173`
+- Frontend: `http://localhost:5173/proyecto2`
 - Backend/API: `http://localhost:8000`
 - Documentacion de FastAPI: `http://localhost:8000/docs`
 - PostgreSQL expuesto localmente en el puerto `5555`

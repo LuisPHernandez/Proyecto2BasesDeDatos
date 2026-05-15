@@ -46,6 +46,13 @@ function Inventario() {
         [lowStockIds]
     )
 
+    const productosMostrados = useMemo(
+        () => lowStockFilter
+            ? productos.filter(p => lowStockIdSet.has(p.id_producto))
+            : productos,
+        [lowStockFilter, productos, lowStockIdSet]
+    )
+
     const handleEditar = (p: Producto) => {
         setEditandoId(p.id_producto)
         setEditForm({ nombre: p.nombre, precio_compra: p.precio_compra, precio_venta: p.precio_venta, unidades_disponibles: p.unidades_disponibles, id_categoria: p.id_categoria, id_proveedor: p.id_proveedor })
@@ -92,13 +99,6 @@ function Inventario() {
 
     if (loading) return <p>Cargando...</p>
     if (error) return <p>Error: {error}</p>
-
-    const productosMostrados = useMemo(
-        () => lowStockFilter
-            ? productos.filter(p => lowStockIdSet.has(p.id_producto))
-            : productos,
-        [lowStockFilter, productos, lowStockIdSet]
-    )
 
     return (
         <div className={styles.container}>

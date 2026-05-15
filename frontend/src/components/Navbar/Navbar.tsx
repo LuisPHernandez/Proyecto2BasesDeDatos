@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from "react-router-dom"
+import { NavLink, Outlet, useNavigate } from "react-router-dom"
+import { useAuth } from "../../context/AuthContext"
 import styles from './Navbar.module.css'
 
 const links = [
@@ -12,6 +13,14 @@ const links = [
 ]
 
 function Navbar() {
+    const { user, logout } = useAuth()
+    const navigate = useNavigate()
+
+    const handleLogout = () => {
+        logout()
+        navigate('/login')
+    }
+
     return (
         <div>
             <nav className={styles.navbar}>
@@ -24,11 +33,21 @@ function Navbar() {
                                 className={({ isActive }) =>
                                     `${styles.navLink} ${isActive ? styles.activeLink : styles.inactiveLink}`
                                 }
-                            >{link.label}</NavLink>
+                            >
+                                {link.label}
+                            </NavLink>
                         </li>
                     ))}
                 </ul>
+
+                <div className={styles.session}>
+                    <span>Sesión: {user?.nombre}</span>
+                    <button className={styles.logoutButton} onClick={handleLogout}>
+                        Cerrar sesión
+                    </button>
+                </div>
             </nav>
+
             <main className={styles.mainContent}>
                 <Outlet />
             </main>

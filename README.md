@@ -47,6 +47,18 @@ docker compose down -v
 docker compose up --build
 ```
 
+## Autenticación simulada
+
+El proyecto incluye una autenticación simulada en el frontend para demostrar el manejo de sesión global con React Context.
+
+Esta autenticación no valida usuarios contra la base de datos ni contra el backend. Su objetivo es mostrar el flujo de login/logout, protección de rutas y estado de sesión compartido en la aplicación.
+
+Credenciales de acceso:
+
+```text
+Usuario: admin
+Contraseña: admin123
+
 ## Estructura del proyecto
 
 ```text

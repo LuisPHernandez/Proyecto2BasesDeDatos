@@ -1,6 +1,6 @@
 import type { EmpleadoBase } from "../types"
 
-const BASE = '/api/empleados/'
+const BASE = 'http://34.51.81.158:8867/api/empleados/'
 
 export async function getEmpleados() {
     const res = await fetch(BASE)

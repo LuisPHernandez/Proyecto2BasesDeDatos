@@ -1,6 +1,6 @@
 import type { CategoriaBase, CategoriaIncome } from "../types"
 
-const BASE = '/api/categorias/'
+const BASE = 'http://34.51.81.158:8867/api/categorias/'
 
 export async function getCategorias() {
     const res = await fetch(BASE)

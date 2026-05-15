@@ -1,6 +1,6 @@
 import type { ProductoBase, ProductoTop } from "../types"
 
-const BASE = '/api/productos/'
+const BASE = 'http://34.51.81.158:8867/api/productos/'
 
 export async function getProductos() {
     const res = await fetch(BASE)

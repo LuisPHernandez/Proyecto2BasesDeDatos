@@ -1,6 +1,6 @@
 import type { VentaCreateInput, VentaSummary } from "../types"
 
-const BASE = '/api/ventas/'
+const BASE = 'http://34.51.81.158:8867/api/ventas/'
 
 export async function getVentas(fecha_inicio: Date, fecha_fin: Date) {
     const res = await fetch(

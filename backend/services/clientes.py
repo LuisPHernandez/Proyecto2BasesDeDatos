@@ -1,8 +1,10 @@
 from repositories import clientes as repo
-from fastapi import HTTPException
-from psycopg2 import DatabaseError
+from fastapi import HTTPException, Depends # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
+from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
+from database import get_db
 
-def get_all():
+def get_all(db: Session = Depends(get_db)):
     """
     Obtiene todos los clientes.
 
@@ -13,14 +15,14 @@ def get_all():
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        return repo.get_all()
-    except DatabaseError:
+        return repo.get_all(db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al obtener los clientes"
         )
 
-def get_active():
+def get_active(db: Session = Depends(get_db)):
     """
     Obtiene los clientes activos.
 
@@ -31,14 +33,14 @@ def get_active():
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        return repo.get_active()
-    except DatabaseError:
+        return repo.get_active(db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al obtener los clientes activos"
         )
 
-def create(nombre: str, email: str):
+def create(nombre: str, email: str, db: Session = Depends(get_db)):
     """
     Crea un nuevo cliente.
 
@@ -53,14 +55,14 @@ def create(nombre: str, email: str):
         HTTPException: Si ocurre un error en la creación (500).
     """
     try:
-        return repo.create(nombre, email)
-    except DatabaseError:
+        return repo.create(nombre, email, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al crear el cliente"
         )
 
-def update(id: int, nombre: str, email: str):
+def update(id: int, nombre: str, email: str, db: Session = Depends(get_db)):
     """
     Actualiza un cliente existente.
 
@@ -77,8 +79,8 @@ def update(id: int, nombre: str, email: str):
         HTTPException: Si ocurre un error en la actualización (500).
     """
     try:
-        p = repo.update(id, nombre, email)
-    except DatabaseError:
+        p = repo.update(id, nombre, email, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al actualizar el cliente"
@@ -87,7 +89,7 @@ def update(id: int, nombre: str, email: str):
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     return p
 
-def delete(id: int):
+def delete(id: int, db: Session = Depends(get_db)):
     """
     Elimina un cliente por su ID.
 
@@ -99,8 +101,8 @@ def delete(id: int):
         HTTPException: Si ocurre un error en la eliminación (500).
     """
     try:
-        p = repo.delete(id)
-    except DatabaseError:
+        p = repo.delete(id, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al eliminar el cliente"

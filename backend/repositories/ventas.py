@@ -1,213 +1,188 @@
-from database import get_connection
-from psycopg2.extras import RealDictCursor
-from psycopg2 import DatabaseError
+from sqlalchemy import text  # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import Session  # pyrefly: ignore [missing-import]
+from sqlalchemy.exc import SQLAlchemyError  # pyrefly: ignore [missing-import]
+from models import Venta, DetalleVenta, Producto, Empleado, Cliente
 from datetime import datetime
 
-def get_all(fecha_inicio: datetime, fecha_fin: datetime):
+def get_all(fecha_inicio: datetime, fecha_fin: datetime, db: Session):
     """
-    Obtiene todas las ventas realizadas en un rango de fechas.
+    Obtiene todas las ventas en un rango de fechas usando la vista venta_detallada.
+    Usa SQL explícito por el uso de la vista.
 
     Args:
         fecha_inicio (datetime): Fecha inicial del rango.
         fecha_fin (datetime): Fecha final del rango.
 
     Returns:
-        list: Lista de ventas.
+        list[dict]: Lista de ventas.
 
     Raises:
-        DatabaseError: Si ocurre un error en la base de datos.
+        SQLAlchemyError: Si ocurre un error en la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
+        sql = text("""
             SELECT *
             FROM venta_detallada
-            WHERE fecha BETWEEN %s AND %s
+            WHERE fecha BETWEEN :fecha_inicio AND :fecha_fin
             ORDER BY fecha DESC
-        """, (fecha_inicio, fecha_fin))
-        return cur.fetchall()
-    except DatabaseError as e:
-        conn.rollback()
+        """)
+        rows = db.execute(sql, {"fecha_inicio": fecha_inicio, "fecha_fin": fecha_fin}).mappings().all()
+        return [dict(row) for row in rows]
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_all ventas: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def get_by_id(id: int):
+
+def get_by_id(id: int, db: Session):
     """
-    Obtiene una venta por su ID.
+    Obtiene una venta por su ID con datos de empleado y cliente.
+    Usa SQL explícito por el JOIN multi-tabla.
 
     Args:
         id (int): ID de la venta.
 
     Returns:
-        dict: Venta.
+        dict | None: Venta con datos de empleado y cliente, o None si no existe.
 
     Raises:
-        DatabaseError: Si ocurre un error en la base de datos.
+        SQLAlchemyError: Si ocurre un error en la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
-            SELECT v.id_venta, v.fecha, v.total, e.nombre AS nombre_empleado, c.email AS email_cliente, c.nombre AS nombre_cliente
-            FROM venta v
-            JOIN empleado e ON v.id_empleado = e.id_empleado
-            JOIN cliente c ON v.id_cliente = c.id_cliente
-            WHERE v.id_venta = %s
-        """, (id,))
-        return cur.fetchone()
-    except DatabaseError as e:
+        row = (
+            db.query(
+                Venta.id_venta,
+                Venta.fecha,
+                Venta.total,
+                Empleado.nombre.label("nombre_empleado"),
+                Cliente.email.label("email_cliente"),
+                Cliente.nombre.label("nombre_cliente"),
+            )
+            .join(Empleado, Venta.id_empleado == Empleado.id_empleado)
+            .join(Cliente, Venta.id_cliente == Cliente.id_cliente)
+            .filter(Venta.id_venta == id)
+            .first()
+        )
+
+        if row is None:
+            return None
+
+        return {
+            "id_venta": row.id_venta,
+            "fecha": row.fecha,
+            "total": row.total,
+            "nombre_empleado": row.nombre_empleado,
+            "email_cliente": row.email_cliente,
+            "nombre_cliente": row.nombre_cliente,
+        }
+
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_by_id ventas: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def get_productos_by_id(id: int):
+
+def get_productos_by_id(id: int, db: Session):
     """
     Obtiene los productos de una venta por su ID.
+    Usa SQL explícito por el JOIN entre detalle_venta y producto.
 
     Args:
         id (int): ID de la venta.
 
     Returns:
-        list: Lista de productos de la venta.
+        list[dict]: Lista de productos de la venta.
 
     Raises:
-        DatabaseError: Si ocurre un error en la base de datos.
+        SQLAlchemyError: Si ocurre un error en la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
-            SELECT p.id_producto, p.nombre AS nombre_producto, dv.precio_unitario, dv.cantidad
+        sql = text("""
+            SELECT p.id_producto, p.nombre AS nombre_producto,
+                   dv.precio_unitario, dv.cantidad
             FROM detalle_venta dv
             JOIN producto p ON dv.id_producto = p.id_producto
-            WHERE dv.id_venta = %s
-        """, (id,))
-        return cur.fetchall()
-    except DatabaseError as e:
+            WHERE dv.id_venta = :id
+        """)
+        rows = db.execute(sql, {"id": id}).mappings().all()
+        return [dict(row) for row in rows]
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_productos_by_id ventas: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list):
+
+def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, db: Session):
     """
-    Crea una nueva venta.
+    Crea una nueva venta con su detalle y descuenta el stock.
+    Transacción explícita con ROLLBACK ante stock insuficiente o error de BD.
 
     Args:
         id_cliente (int): ID del cliente.
         id_empleado (int): ID del empleado.
         fecha (datetime): Fecha de la venta.
-        productos (list): Lista de productos de la venta.
+        productos (list): Lista de dicts con id_producto, precio_unitario y cantidad.
 
     Returns:
-        dict: Venta creada.
+        dict: Venta creada con datos de empleado y cliente.
 
     Raises:
-        DatabaseError: Si ocurre un error en la base de datos.
+        ValueError: Si el stock de algún producto es insuficiente.
+        SQLAlchemyError: Si ocurre un error en la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
+        total = sum(p["precio_unitario"] * p["cantidad"] for p in productos)
 
-        total = sum(producto['precio_unitario'] * producto['cantidad'] for producto in productos)
+        with db.begin():
+            venta = Venta(
+                id_cliente=id_cliente,
+                id_empleado=id_empleado,
+                fecha=fecha,
+                total=total,
+            )
+            db.add(venta)
+            db.flush()
 
-        cur.execute("BEGIN")
+            for p in productos:
+                db.add(DetalleVenta(
+                    id_venta=venta.id_venta,
+                    id_producto=p["id_producto"],
+                    precio_unitario=p["precio_unitario"],
+                    cantidad=p["cantidad"],
+                ))
 
-        cur.execute("""
-            INSERT INTO venta (id_cliente, id_empleado, fecha, total)
-            VALUES (%s, %s, %s, %s)
-            RETURNING id_venta
-        """, (id_cliente, id_empleado, fecha, total))
-        id_venta = cur.fetchone()['id_venta']
+                producto = db.query(Producto).filter(Producto.id_producto == p["id_producto"]).first()
+                producto.unidades_disponibles -= p["cantidad"]
 
-        for producto in productos:
-            cur.execute("""
-                INSERT INTO detalle_venta (id_venta, id_producto, precio_unitario, cantidad)
-                VALUES (%s, %s, %s, %s)
-            """, (id_venta, producto['id_producto'], producto['precio_unitario'], producto['cantidad']))
+                if producto.unidades_disponibles < 0:
+                    raise ValueError(f"Stock insuficiente para producto {p['id_producto']}")
 
-            cur.execute("""
-                UPDATE producto
-                SET unidades_disponibles = unidades_disponibles - %s
-                WHERE id_producto = %s
-            """, (producto['cantidad'], producto['id_producto']))
-
-            cur.execute("SELECT unidades_disponibles FROM producto WHERE id_producto = %s", (producto['id_producto'],))
-            stock = cur.fetchone()['unidades_disponibles']
-            if stock < 0:
-                raise ValueError(f"Stock insuficiente para producto {producto['id_producto']}")
-
-        cur.execute("COMMIT")
-
-        cur.execute("""
-            SELECT v.id_venta, v.fecha, v.total, e.nombre AS nombre_empleado, c.email AS email_cliente, c.nombre AS nombre_cliente
-            FROM venta v
-            JOIN empleado e ON v.id_empleado = e.id_empleado
-            JOIN cliente c ON v.id_cliente = c.id_cliente
-            WHERE v.id_venta = %s
-        """, (id_venta,))
-        return cur.fetchone()
+        return get_by_id(venta.id_venta, db)
     except Exception as e:
-        cur.execute("ROLLBACK")
-        print(f"Error de base de datos en create ventas: {e}")
+        print(f"Error en create ventas: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def delete(id: int):
+
+def delete(id: int, db: Session):
     """
-    Elimina una venta.
+    Elimina una venta por su ID.
 
     Args:
         id (int): ID de la venta.
 
     Returns:
-        dict: Venta eliminada.
+        Venta | None: Venta eliminada o None si no existe.
 
     Raises:
-        DatabaseError: Si ocurre un error en la base de datos.
+        SQLAlchemyError: Si ocurre un error en la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
-            DELETE FROM venta WHERE id_venta = %s RETURNING *
-        """, (id,))
-        venta = cur.fetchone()
-        conn.commit()
+        venta = db.query(Venta).filter(Venta.id_venta == id).first()
+
+        if venta is None:
+            return None
+
+        db.delete(venta)
+        db.commit()
         return venta
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
+        db.rollback()
         print(f"Error de base de datos en delete ventas: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()

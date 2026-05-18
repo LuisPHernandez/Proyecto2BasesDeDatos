@@ -1,49 +1,38 @@
-from database import get_connection
-from psycopg2.extras import RealDictCursor
-from psycopg2 import DatabaseError
+from sqlalchemy import text  # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import Session  # pyrefly: ignore [missing-import]
+from sqlalchemy.exc import SQLAlchemyError  # pyrefly: ignore [missing-import]
+from models import Cliente
 
-def get_all():
+
+def get_all(db: Session):
     """
     Obtiene todos los clientes.
 
     Returns:
-        list: Lista de clientes.
+        list[Cliente]: Lista de clientes.
 
     Raises:
-        DatabaseError: Si ocurre un error al consultar la base de datos.
+        SQLAlchemyError: Si ocurre un error al consultar la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT * FROM cliente ORDER BY id_cliente")
-        return cur.fetchall()
-    except DatabaseError as e:
+        return db.query(Cliente).order_by(Cliente.id_cliente).all()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_all cliente: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def get_active():
+
+def get_active(db: Session):
     """
-    Obtiene los clientes activos.
+    Obtiene los IDs de clientes activos (con compras en el último mes).
 
     Returns:
-        list: Lista de clientes activos.
+        list[int]: Lista de IDs de clientes activos.
 
     Raises:
-        DatabaseError: Si ocurre un error al consultar la base de datos.
+        SQLAlchemyError: Si ocurre un error al consultar la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
+        sql = text("""
             SELECT id_cliente
             FROM cliente
             WHERE id_cliente IN (
@@ -53,18 +42,35 @@ def get_active():
             )
             ORDER BY id_cliente
         """)
-        rows = cur.fetchall()
+
+        rows = db.execute(sql).mappings().all()
         return [row["id_cliente"] for row in rows]
-    except DatabaseError as e:
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_active cliente: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def create(nombre: str, email: str):
+
+def get_by_id(id: int, db: Session):
+    """
+    Obtiene un cliente por su ID.
+
+    Args:
+        id (int): ID del cliente.
+
+    Returns:
+        Cliente | None: Cliente encontrado o None si no existe.
+
+    Raises:
+        SQLAlchemyError: Si ocurre un error al consultar la base de datos.
+    """
+    try:
+        return db.query(Cliente).filter(Cliente.id_cliente == id).first()
+    except SQLAlchemyError as e:
+        print(f"Error de base de datos en get_by_id cliente: {e}")
+        raise
+
+
+def create(nombre: str, email: str, db: Session):
     """
     Crea un nuevo cliente.
 
@@ -73,31 +79,24 @@ def create(nombre: str, email: str):
         email (str): Correo electrónico del cliente.
 
     Returns:
-        dict: Cliente creado con su ID asignado.
+        Cliente: Cliente creado con su ID asignado.
 
     Raises:
-        DatabaseError: Si ocurre un error al crear el cliente.
+        SQLAlchemyError: Si ocurre un error al crear el cliente.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("INSERT INTO cliente (nombre, email) VALUES (%s, %s) RETURNING *", (nombre, email))
-        cliente = cur.fetchone()
-        conn.commit()
+        cliente = Cliente(nombre=nombre, email=email)
+        db.add(cliente)
+        db.commit()
+        db.refresh(cliente)
         return cliente
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
+        db.rollback()
         print(f"Error de base de datos en create cliente: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def update(id: int, nombre: str, email: str):
+
+def update(id: int, nombre: str, email: str, db: Session):
     """
     Actualiza un cliente existente.
 
@@ -107,31 +106,30 @@ def update(id: int, nombre: str, email: str):
         email (str): Nuevo correo electrónico del cliente.
 
     Returns:
-        dict: Cliente actualizado.
+        Cliente | None: Cliente actualizado o None si no existe.
 
     Raises:
-        DatabaseError: Si ocurre un error al actualizar el cliente.
+        SQLAlchemyError: Si ocurre un error al actualizar el cliente.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("UPDATE cliente SET nombre = %s, email = %s WHERE id_cliente = %s RETURNING *", (nombre, email, id))
-        cliente = cur.fetchone()
-        conn.commit()
+        cliente = db.query(Cliente).filter(Cliente.id_cliente == id).first()
+
+        if cliente is None:
+            return None
+
+        cliente.nombre = nombre
+        cliente.email = email
+
+        db.commit()
+        db.refresh(cliente)
         return cliente
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
+        db.rollback()
         print(f"Error de base de datos en update cliente: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def delete(id: int):
+
+def delete(id: int, db: Session):
     """
     Elimina un cliente por su ID.
 
@@ -139,26 +137,21 @@ def delete(id: int):
         id (int): ID del cliente a eliminar.
 
     Returns:
-        dict: Cliente eliminado.
+        Cliente | None: Cliente eliminado o None si no existe.
 
     Raises:
-        DatabaseError: Si ocurre un error al eliminar el cliente.
+        SQLAlchemyError: Si ocurre un error al eliminar el cliente.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("DELETE FROM cliente WHERE id_cliente = %s RETURNING *", (id,))
-        cliente = cur.fetchone()
-        conn.commit()
+        cliente = db.query(Cliente).filter(Cliente.id_cliente == id).first()
+
+        if cliente is None:
+            return None
+
+        db.delete(cliente)
+        db.commit()
         return cliente
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
+        db.rollback()
         print(f"Error de base de datos en delete cliente: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()    

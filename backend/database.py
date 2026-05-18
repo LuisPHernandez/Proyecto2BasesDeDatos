@@ -1,34 +1,26 @@
 import psycopg2
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv # pyrefly: ignore [missing-import]
+from sqlalchemy import create_engine # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import sessionmaker, declarative_base # pyrefly: ignore [missing-import]
 
 load_dotenv()
 
-def get_connection():
+DATABASE_URL = (
+    f"postgresql+psycopg2://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+)
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+Base = declarative_base()
+
+def get_db():
     """
-    Crea y retorna una conexión a la base de datos PostgreSQL.
-
-    La conexión se configura a partir de variables de entorno:
-    - DB_HOST
-    - DB_PORT
-    - DB_NAME
-    - DB_USER
-    - DB_PASSWORD
-
-    Returns:
-        connection: Objeto de conexión a la base de datos.
-
-    Raises:
-        psycopg2.DatabaseError: Si ocurre un error al establecer la conexión.
+    Obtiene una sesión de base de datos.
     """
+    db = SessionLocal()
     try:
-        return psycopg2.connect(
-            host=os.getenv("DB_HOST"),
-            port=os.getenv("DB_PORT"),
-            dbname=os.getenv("DB_NAME"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-        )
-    except psycopg2.DatabaseError as e:
-        print(f"Error al conectarse a la base de datos: {e}")
-        raise e
+        yield db
+    finally:
+        db.close()

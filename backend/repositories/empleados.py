@@ -1,23 +1,22 @@
-from database import get_connection
-from psycopg2.extras import RealDictCursor
-from psycopg2 import DatabaseError
+from sqlalchemy import text  # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import Session  # pyrefly: ignore [missing-import]
+from sqlalchemy.exc import SQLAlchemyError  # pyrefly: ignore [missing-import]
+from models import Empleado
 
-def get_all():
+
+def get_all(db: Session):
     """
-    Obtiene todos los empleados.
+    Obtiene todos los empleados con sus ventas e ingresos.
+    Usa SQL explícito por el GROUP BY / HAVING.
 
     Returns:
-        list: Lista de empleados.
+        list[dict]: Lista de empleados con conteo de ventas e ingresos.
 
     Raises:
-        DatabaseError: Si ocurre un error al consultar la base de datos.
+        SQLAlchemyError: Si ocurre un error al consultar la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
+        sql = text("""
             SELECT e.id_empleado, e.nombre, COUNT(v.id_venta) AS ventas, SUM(v.total) AS ingresos
             FROM empleado e
             JOIN venta v ON e.id_empleado = v.id_empleado
@@ -25,17 +24,34 @@ def get_all():
             HAVING SUM(v.total) > 1
             ORDER BY ingresos DESC
         """)
-        return cur.fetchall()
-    except DatabaseError as e:
+        rows = db.execute(sql).mappings().all()
+        return [dict(row) for row in rows]
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_all empleado: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def create(nombre: str):
+
+def get_by_id(id: int, db: Session):
+    """
+    Obtiene un empleado por su ID.
+
+    Args:
+        id (int): ID del empleado.
+
+    Returns:
+        Empleado | None: Empleado encontrado o None si no existe.
+
+    Raises:
+        SQLAlchemyError: Si ocurre un error al consultar la base de datos.
+    """
+    try:
+        return db.query(Empleado).filter(Empleado.id_empleado == id).first()
+    except SQLAlchemyError as e:
+        print(f"Error de base de datos en get_by_id empleado: {e}")
+        raise
+
+
+def create(nombre: str, db: Session):
     """
     Crea un nuevo empleado.
 
@@ -43,31 +59,24 @@ def create(nombre: str):
         nombre (str): Nombre del empleado.
 
     Returns:
-        dict: Empleado creado con su ID asignado.
+        Empleado: Empleado creado con su ID asignado.
 
     Raises:
-        DatabaseError: Si ocurre un error al crear el empleado.
+        SQLAlchemyError: Si ocurre un error al crear el empleado.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("INSERT INTO empleado (nombre) VALUES (%s) RETURNING *", (nombre,))
-        empleado = cur.fetchone()
-        conn.commit()
+        empleado = Empleado(nombre=nombre)
+        db.add(empleado)
+        db.commit()
+        db.refresh(empleado)
         return empleado
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
+        db.rollback()
         print(f"Error de base de datos en create empleado: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def update(id: int, nombre: str):
+
+def update(id: int, nombre: str, db: Session):
     """
     Actualiza un empleado existente.
 
@@ -76,31 +85,28 @@ def update(id: int, nombre: str):
         nombre (str): Nuevo nombre del empleado.
 
     Returns:
-        dict: Empleado actualizado.
+        Empleado | None: Empleado actualizado o None si no existe.
 
     Raises:
-        DatabaseError: Si ocurre un error al actualizar el empleado.
+        SQLAlchemyError: Si ocurre un error al actualizar el empleado.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("UPDATE empleado SET nombre = %s WHERE id_empleado = %s RETURNING *", (nombre, id))
-        empleado = cur.fetchone()
-        conn.commit()
+        empleado = db.query(Empleado).filter(Empleado.id_empleado == id).first()
+
+        if empleado is None:
+            return None
+
+        empleado.nombre = nombre
+        db.commit()
+        db.refresh(empleado)
         return empleado
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
+        db.rollback()
         print(f"Error de base de datos en update empleado: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def delete(id: int):
+
+def delete(id: int, db: Session):
     """
     Elimina un empleado por su ID.
 
@@ -108,26 +114,21 @@ def delete(id: int):
         id (int): ID del empleado a eliminar.
 
     Returns:
-        dict: Empleado eliminado.
+        Empleado | None: Empleado eliminado o None si no existe.
 
     Raises:
-        DatabaseError: Si ocurre un error al eliminar el empleado.
+        SQLAlchemyError: Si ocurre un error al eliminar el empleado.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("DELETE FROM empleado WHERE id_empleado = %s RETURNING *", (id,))
-        empleado = cur.fetchone()
-        conn.commit()
+        empleado = db.query(Empleado).filter(Empleado.id_empleado == id).first()
+
+        if empleado is None:
+            return None
+
+        db.delete(empleado)
+        db.commit()
         return empleado
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
+        db.rollback()
         print(f"Error de base de datos en delete empleado: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()    

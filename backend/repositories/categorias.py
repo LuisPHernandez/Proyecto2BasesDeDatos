@@ -1,8 +1,9 @@
-from database import get_connection
-from psycopg2.extras import RealDictCursor
-from psycopg2 import DatabaseError
+from sqlalchemy import text # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
+from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
+from models import Categoria
 
-def get_all():
+def get_all(db: Session):
     """
     Obtiene todas las categorías.
 
@@ -12,23 +13,13 @@ def get_all():
     Raises:
         DatabaseError: Si ocurre un error al consultar la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT * FROM categoria ORDER BY id_categoria")
-        return cur.fetchall()
-    except DatabaseError as e:
+        return db.query(Categoria).all()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_all categoria: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def get_income():
+def get_income(db: Session):
     """
     Obtiene las categorías con sus ingresos.
 
@@ -38,13 +29,12 @@ def get_income():
     Raises:
         DatabaseError: Si ocurre un error al consultar la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
-            SELECT c.id_categoria, c.nombre, SUM(dv.precio_unitario * dv.cantidad) AS ingresos
+        sql = text("""
+            SELECT 
+                c.id_categoria, 
+                c.nombre, 
+                SUM(dv.precio_unitario * dv.cantidad) AS ingresos
             FROM categoria c
             JOIN producto p ON c.id_categoria = p.id_categoria
             JOIN detalle_venta dv ON p.id_producto = dv.id_producto
@@ -52,17 +42,15 @@ def get_income():
             HAVING SUM(dv.precio_unitario * dv.cantidad) > 1
             ORDER BY ingresos DESC;
         """)
-        return cur.fetchall()
-    except DatabaseError as e:
-        print(f"Error de base de datos en get_income categoria: {e}")
-        raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def create(nombre: str):
+        rows = db.execute(sql).mappings().all()
+
+        return [dict(row) for row in rows]
+    except SQLAlchemyError as e:
+        print(f"Error de base de datos en get_income_categoria: {e}")
+        raise
+
+def create(nombre: str, db: Session):
     """
     Crea una nueva categoría.
 
@@ -75,26 +63,17 @@ def create(nombre: str):
     Raises:
         DatabaseError: Si ocurre un error al crear la categoría.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("INSERT INTO categoria (nombre) VALUES (%s) RETURNING *", (nombre,))
-        categoria = cur.fetchone()
-        conn.commit()
+        categoria = Categoria(nombre=nombre)
+        db.add(categoria)
+        db.commit()
+        db.refresh(categoria)
         return categoria
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en create categoria: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def update(id: int, nombre: str):
+def update(id: int, nombre: str, db: Session):
     """
     Actualiza una categoría existente.
 
@@ -108,26 +87,22 @@ def update(id: int, nombre: str):
     Raises:
         DatabaseError: Si ocurre un error al actualizar la categoría.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("UPDATE categoria SET nombre = %s WHERE id_categoria = %s RETURNING *", (nombre, id))
-        categoria = cur.fetchone()
-        conn.commit()
+        categoria = db.query(Categoria).filter(Categoria.id_categoria == id).first()
+
+        if categoria is None:
+            return None
+
+        categoria.nombre = nombre
+
+        db.commit()
+        db.refresh(categoria)
         return categoria
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en update categoria: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def delete(id: int):
+def delete(id: int, db: Session):
     """
     Elimina una categoría por su ID.
 
@@ -140,21 +115,15 @@ def delete(id: int):
     Raises:
         DatabaseError: Si ocurre un error al eliminar la categoría.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("DELETE FROM categoria WHERE id_categoria = %s RETURNING *", (id,))
-        categoria = cur.fetchone()
-        conn.commit()
+        categoria = db.query(Categoria).filter(Categoria.id_categoria == id).first()
+
+        if categoria is None:
+            return None
+
+        db.delete(categoria)
+        db.commit()
         return categoria
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en delete categoria: {e}")
-        raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()    
+        raise  

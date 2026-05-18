@@ -1,8 +1,9 @@
-from database import get_connection
-from psycopg2.extras import RealDictCursor
-from psycopg2 import DatabaseError
+from sqlalchemy import text # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
+from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
+from models import Producto, Proveedor, Categoria
 
-def get_all():
+def get_all(db: Session):
     """
     Obtiene todos los productos con proveedor y categoría.
 
@@ -12,29 +13,28 @@ def get_all():
     Raises:
         DatabaseError: Si ocurre un error al consultar la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
-            SELECT pr.*, pv.nombre as proveedor, c.nombre as categoria
-            FROM producto pr
-            JOIN proveedor pv ON pr.id_proveedor = pv.id_proveedor
-            JOIN categoria c ON pr.id_categoria = c.id_categoria
-            ORDER BY pr.id_producto
-        """)
-        return cur.fetchall()
-    except DatabaseError as e:
+        rows = (
+            db.query(Producto, Proveedor.nombre.label("proveedor"), Categoria.nombre.label("categoria"))
+            .join(Proveedor, Producto.id_proveedor == Proveedor.id_proveedor)
+            .join(Categoria, Producto.id_categoria == Categoria.id_categoria)
+            .order_by(Producto.id_producto)
+            .all()
+        )
+
+        return [
+            {
+                **producto.__dict__,
+                "proveedor": proveedor,
+                "categoria": categoria,
+            }
+            for producto, proveedor, categoria in rows
+        ]
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_all productos: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def get_low_stock():
+def get_low_stock(db: Session):
     """
     Obtiene los productos con bajo stock que han sido vendidos al menos una vez.
 
@@ -44,30 +44,26 @@ def get_low_stock():
     Raises:
         DatabaseError: Si ocurre un error al consultar la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
+        sql = text("""
             SELECT DISTINCT id_producto
             FROM detalle_venta
             WHERE id_producto IN (
-                SELECT id_producto FROM producto WHERE unidades_disponibles < 10
+                SELECT id_producto
+                FROM producto
+                WHERE unidades_disponibles < 10
             );
         """)
-        rows = cur.fetchall()
-        return [row["id_producto"] for row in rows]
-    except DatabaseError as e:
-        print(f"Error de base de datos en get_low_stock productos: {e}")
-        raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def get_top_mes():
+        rows = db.execute(sql).mappings().all()
+
+        return [row["id_producto"] for row in rows]
+
+    except SQLAlchemyError as e:
+        print(f"Error de base de datos en get_low_stock_productos: {e}")
+        raise
+
+def get_top_mes(db: Session):
     """
     Obtiene los productos más vendidos del mes usando CTE.
 
@@ -77,17 +73,13 @@ def get_top_mes():
     Raises:
         DatabaseError: Si ocurre un error al consultar la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
+        sql = text("""
             WITH ventas_mes AS (
                 SELECT
                     dv.id_producto,
-                    SUM(dv.cantidad)                        AS unidades_vendidas,
-                    SUM(dv.cantidad * dv.precio_unitario)   AS ingresos
+                    SUM(dv.cantidad) AS unidades_vendidas,
+                    SUM(dv.cantidad * dv.precio_unitario) AS ingresos
                 FROM detalle_venta dv
                 JOIN venta v ON dv.id_venta = v.id_venta
                 WHERE DATE_TRUNC('month', v.fecha) = DATE_TRUNC('month', CURRENT_DATE)
@@ -103,17 +95,16 @@ def get_top_mes():
             ORDER BY vm.unidades_vendidas DESC
             LIMIT 5
         """)
-        return cur.fetchall()
-    except DatabaseError as e:
+
+        rows = db.execute(sql).mappings().all()
+
+        return [dict(row) for row in rows]
+
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_top_mes productos: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def get_by_id(id: int):
+def get_by_id(id: int, db: Session):
     """
     Obtiene un producto por su ID.
 
@@ -126,29 +117,29 @@ def get_by_id(id: int):
     Raises:
         DatabaseError: Si ocurre un error al consultar la base de datos.
     """    
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
-            SELECT pr.*, pv.nombre as proveedor, c.nombre as categoria
-            FROM producto pr
-            JOIN proveedor pv ON pr.id_proveedor = pv.id_proveedor
-            JOIN categoria c ON pr.id_categoria = c.id_categoria
-            WHERE pr.id_producto = %s
-        """, (id,))
-        return cur.fetchone()
-    except DatabaseError as e:
+        row = (
+            db.query(Producto, Proveedor.nombre.label("proveedor"), Categoria.nombre.label("categoria"))
+            .join(Proveedor, Producto.id_proveedor == Proveedor.id_proveedor)
+            .join(Categoria, Producto.id_categoria == Categoria.id_categoria)
+            .filter(Producto.id_producto == id)
+            .first()
+        )
+
+        if row is None:
+            return None
+
+        producto, proveedor, categoria = row
+        return {
+            **producto.__dict__,
+            "proveedor": proveedor,
+            "categoria": categoria,
+        }
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_by_id productos: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int):
+def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int, db: Session):
     """
     Crea un nuevo producto.
 
@@ -166,30 +157,25 @@ def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_ven
     Raises:
         DatabaseError: Si ocurre un error al crear el producto.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
-            INSERT INTO producto (id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria) 
-            VALUES (%s, %s, %s, %s, %s, %s) 
-            RETURNING *
-        """, (id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria))
-        producto = cur.fetchone()
-        conn.commit()
+        producto = Producto(
+            id_proveedor=id_proveedor,
+            nombre=nombre,
+            unidades_disponibles=unidades_disponibles,
+            precio_venta=precio_venta,
+            precio_compra=precio_compra,
+            id_categoria=id_categoria,
+        )
+
+        db.add(producto)
+        db.commit()
+        db.refresh(producto)
         return producto
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en create productos: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int):
+def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int, db: Session):
     """
     Actualiza un producto existente.
 
@@ -208,31 +194,27 @@ def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, p
     Raises:
         DatabaseError: Si ocurre un error al actualizar el producto.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
-            UPDATE producto 
-            SET id_proveedor = %s, nombre = %s, unidades_disponibles = %s, precio_venta = %s, precio_compra = %s, id_categoria = %s
-            WHERE id_producto = %s
-            RETURNING *
-        """, (id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria, id))
-        producto = cur.fetchone()
-        conn.commit()
+        producto = db.query(Producto).filter(Producto.id_producto == id).first()
+
+        if producto is None:
+            return None
+
+        producto.id_proveedor = id_proveedor
+        producto.nombre = nombre
+        producto.unidades_disponibles = unidades_disponibles
+        producto.precio_venta = precio_venta
+        producto.precio_compra = precio_compra
+        producto.id_categoria = id_categoria
+
+        db.commit()
+        db.refresh(producto)
         return producto
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en update productos: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def delete(id: int):
+def delete(id: int, db: Session):
     """
     Elimina un producto por su ID.
 
@@ -245,23 +227,15 @@ def delete(id: int):
     Raises:
         DatabaseError: Si ocurre un error al eliminar el producto.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("""
-            DELETE FROM producto WHERE id_producto = %s RETURNING *
-        """, (id,))
-        producto = cur.fetchone()
-        conn.commit()
+        producto = db.query(Producto).filter(Producto.id_producto == id).first()
+
+        if producto is None:
+            return None
+
+        db.delete(producto)
+        db.commit()
         return producto
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en delete productos: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()

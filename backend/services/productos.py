@@ -1,8 +1,10 @@
 from repositories import productos as repo
-from fastapi import HTTPException
-from psycopg2 import DatabaseError
+from fastapi import HTTPException, Depends # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
+from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
+from database import get_db
 
-def get_all():
+def get_all(db: Session = Depends(get_db)):
     """
     Obtiene todos los productos.
 
@@ -13,14 +15,14 @@ def get_all():
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        return repo.get_all()
-    except DatabaseError:
+        return repo.get_all(db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al obtener los productos"
         )
 
-def get_low_stock():
+def get_low_stock(db: Session = Depends(get_db)):
     """
     Obtiene los productos con bajo stock.
 
@@ -31,14 +33,14 @@ def get_low_stock():
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        return repo.get_low_stock()
-    except DatabaseError:
+        return repo.get_low_stock(db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al obtener los productos con bajo stock"
         )
 
-def get_top_mes():
+def get_top_mes(db: Session = Depends(get_db)):
     """
     Obtiene los productos más vendidos del mes.
 
@@ -49,14 +51,14 @@ def get_top_mes():
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        return repo.get_top_mes()
-    except DatabaseError:
+        return repo.get_top_mes(db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al obtener los productos más vendidos"
         )
 
-def get_by_id(id: int):
+def get_by_id(id: int, db: Session = Depends(get_db)):
     """
     Obtiene un producto por su ID.
 
@@ -71,8 +73,8 @@ def get_by_id(id: int):
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        p = repo.get_by_id(id)
-    except DatabaseError:
+        p = repo.get_by_id(id, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al obtener el producto"
@@ -81,7 +83,7 @@ def get_by_id(id: int):
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return p
 
-def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int):
+def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int, db: Session = Depends(get_db)):
     """
     Crea un nuevo producto.
 
@@ -100,14 +102,14 @@ def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_ven
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        return repo.create(id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria)
-    except DatabaseError:
+        return repo.create(id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al crear el producto"
         )
 
-def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int):
+def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int, db: Session = Depends(get_db)):
     """
     Actualiza un producto existente.
 
@@ -128,8 +130,8 @@ def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, p
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        p = repo.update(id, id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria)
-    except DatabaseError:
+        p = repo.update(id, id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al actualizar el producto"
@@ -138,7 +140,7 @@ def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, p
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return p
 
-def delete(id: int):
+def delete(id: int, db: Session = Depends(get_db)):
     """
     Elimina un producto por su ID.
 
@@ -150,8 +152,8 @@ def delete(id: int):
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        p = repo.delete(id)
-    except DatabaseError:
+        p = repo.delete(id, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al eliminar el producto"

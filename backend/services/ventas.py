@@ -1,9 +1,11 @@
 from repositories import ventas as repo
-from fastapi import HTTPException
-from psycopg2 import DatabaseError
+from fastapi import HTTPException, Depends # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
+from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
+from database import get_db
 from datetime import datetime
 
-def get_all(fecha_inicio: datetime, fecha_fin: datetime):
+def get_all(fecha_inicio: datetime, fecha_fin: datetime, db: Session = Depends(get_db)):
     """
     Obtiene todas las ventas realizadas en un rango de fechas.
 
@@ -18,14 +20,14 @@ def get_all(fecha_inicio: datetime, fecha_fin: datetime):
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        return repo.get_all(fecha_inicio, fecha_fin)
-    except DatabaseError:
+        return repo.get_all(fecha_inicio, fecha_fin, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al obtener las ventas"
         )
 
-def get_by_id(id: int):
+def get_by_id(id: int, db: Session = Depends(get_db)):
     """
     Obtiene una venta por ID.
 
@@ -40,8 +42,8 @@ def get_by_id(id: int):
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        v = repo.get_by_id(id)
-    except DatabaseError:   
+        v = repo.get_by_id(id, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al obtener la venta"
@@ -50,7 +52,7 @@ def get_by_id(id: int):
         raise HTTPException(status_code=404, detail="Venta no encontrada")
     return v
 
-def get_productos_by_id(id: int):
+def get_productos_by_id(id: int, db: Session = Depends(get_db)):
     """
     Obtiene los productos de una venta por ID.
 
@@ -64,14 +66,14 @@ def get_productos_by_id(id: int):
         HTTPException: Si ocurre un error en la base de datos (500).
     """
     try:
-        return repo.get_productos_by_id(id)
-    except DatabaseError:
+        return repo.get_productos_by_id(id, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al obtener los productos de la venta"
         )
 
-def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list):
+def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, db: Session = Depends(get_db)):
     """
     Crea una nueva venta.
 
@@ -88,13 +90,13 @@ def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list):
         HTTPException: Si ocurre un error en la creación (500).
     """
     try:
-        return repo.create(id_cliente, id_empleado, fecha, [producto.dict() for producto in productos])
+        return repo.create(id_cliente, id_empleado, fecha, [producto.dict() for producto in productos], db)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except DatabaseError:
+    except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Error de base de datos al crear la venta")
 
-def delete(id: int):
+def delete(id: int, db: Session = Depends(get_db)):
     """
     Elimina una venta por su ID.
 
@@ -106,8 +108,8 @@ def delete(id: int):
         HTTPException: Si ocurre un error en la eliminación (500).
     """
     try:
-        v = repo.delete(id)
-    except DatabaseError:
+        v = repo.delete(id, db)
+    except SQLAlchemyError:
         raise HTTPException(
             status_code=500,
             detail="Error de base de datos al eliminar la venta"

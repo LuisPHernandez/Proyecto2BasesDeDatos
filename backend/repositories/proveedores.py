@@ -1,8 +1,9 @@
-from database import get_connection
-from psycopg2.extras import RealDictCursor
-from psycopg2 import DatabaseError
+from sqlalchemy import text # pyrefly: ignore [missing-import]
+from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
+from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
+from models import Proveedor
 
-def get_all():
+def get_all(db: Session):
     """
     Obtiene todos los proveedores.
 
@@ -12,23 +13,13 @@ def get_all():
     Raises:
         DatabaseError: Si ocurre un error al consultar la base de datos.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT * FROM proveedor ORDER BY id_proveedor")
-        return cur.fetchall()
-    except DatabaseError as e:
+        return db.query(Proveedor).all()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en get_all proveedor: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def create(nombre: str, email: str):
+def create(nombre: str, email: str, db: Session):
     """
     Crea un nuevo proveedor.
 
@@ -42,26 +33,17 @@ def create(nombre: str, email: str):
     Raises:
         DatabaseError: Si ocurre un error al crear el proveedor.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("INSERT INTO proveedor (nombre, email) VALUES (%s, %s) RETURNING *", (nombre, email))
-        proveedor = cur.fetchone()
-        conn.commit()
+        proveedor = Proveedor(nombre=nombre, email=email)
+        db.add(proveedor)
+        db.commit()
+        db.refresh(proveedor)
         return proveedor
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en create proveedor: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def update(id: int, nombre: str, email: str):
+def update(id: int, nombre: str, email: str, db: Session):
     """
     Actualiza un proveedor existente.
 
@@ -76,26 +58,23 @@ def update(id: int, nombre: str, email: str):
     Raises:
         DatabaseError: Si ocurre un error al actualizar el proveedor.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("UPDATE proveedor SET nombre = %s, email = %s WHERE id_proveedor = %s RETURNING *", (nombre, email, id))
-        proveedor = cur.fetchone()
-        conn.commit()
+        proveedor = db.query(Proveedor).filter(Proveedor.id_proveedor == id).first()
+
+        if proveedor is None:
+            return None
+
+        proveedor.nombre = nombre
+        proveedor.email = email
+
+        db.commit()
+        db.refresh(proveedor)
         return proveedor
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en update proveedor: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()
 
-def delete(id: int):
+def delete(id: int, db: Session):
     """
     Elimina un proveedor por su ID.
 
@@ -108,21 +87,15 @@ def delete(id: int):
     Raises:
         DatabaseError: Si ocurre un error al eliminar el proveedor.
     """
-    conn = None
-    cur = None
     try:
-        conn = get_connection()
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("DELETE FROM proveedor WHERE id_proveedor = %s RETURNING *", (id,))
-        proveedor = cur.fetchone()
-        conn.commit()
+        proveedor = db.query(Proveedor).filter(Proveedor.id_proveedor == id).first()
+
+        if proveedor is None:
+            return None
+
+        db.delete(proveedor)
+        db.commit()
         return proveedor
-    except DatabaseError as e:
-        conn.rollback()
+    except SQLAlchemyError as e:
         print(f"Error de base de datos en delete proveedor: {e}")
         raise
-    finally:
-        if cur is not None:
-            cur.close()
-        if conn is not None:
-            conn.close()    

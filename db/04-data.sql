@@ -1071,6 +1071,14 @@ INSERT INTO detalle_venta (id_venta, id_producto, precio_unitario, cantidad) VAL
 (160,35,12.50,4),
 (160,52,13.50,1);
 
+-- USUARIOS DE PRUEBA PARA AUTENTICACION
+INSERT INTO usuario_app (username, password, nombre, rol) VALUES
+('admin', 'admin123', 'Administrador', 'rol_admin'),
+('gerente', 'gerente123', 'Gerente', 'rol_gerente'),
+('vendedor', 'vendedor123', 'Vendedor', 'rol_vendedor'),
+('bodeguero', 'bodeguero123', 'Bodeguero', 'rol_bodeguero'),
+('auditor', 'auditor123', 'Auditor', 'rol_auditor');
+
 -- Ajusta el inventario restando las unidades vendidas.
 UPDATE producto p
 SET unidades_disponibles = GREATEST(0, p.unidades_disponibles - sub.total_vendido)

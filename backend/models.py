@@ -74,3 +74,12 @@ class DetalleVenta(Base):
 
     venta = relationship("Venta", back_populates="detalles")
     producto = relationship("Producto", back_populates="detalles")
+
+class UsuarioApp(Base):
+    __tablename__ = "usuario_app"
+
+    id_usuario = Column(Integer, primary_key=True, index=True)
+    username = Column(Text, nullable=False, unique=True)
+    password = Column(Text, nullable=False)
+    nombre = Column(Text, nullable=False)
+    rol = Column(Text, nullable=False)

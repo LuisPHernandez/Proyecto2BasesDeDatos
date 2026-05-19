@@ -12,7 +12,6 @@ services:
       - ./db/03-views.sql:/docker-entrypoint-initdb.d/03-views.sql
       - ./db/04-data.sql:/docker-entrypoint-initdb.d/04-data.sql
       - ./db/05-roles.sql:/docker-entrypoint-initdb.d/05-roles.sql
-      - ./db/06-procedures.sql:/docker-entrypoint-initdb.d/06-procedures.sql
       - pgdata:/var/lib/postgresql/data
     ports:
       - "5555:5432"

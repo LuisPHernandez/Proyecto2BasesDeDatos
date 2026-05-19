@@ -78,3 +78,11 @@ CREATE TABLE detalle_venta (
         REFERENCES producto(id_producto)
         ON DELETE CASCADE
 );
+
+CREATE TABLE usuario_app (
+    id_usuario INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    nombre TEXT NOT NULL,
+    rol TEXT NOT NULL
+);

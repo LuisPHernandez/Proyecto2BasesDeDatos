@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import productos, ventas, proveedores, categorias, empleados, clientes
+from routers import productos, ventas, proveedores, categorias, empleados, clientes, auth
 
 # Inicialización de la aplicación FastAPI
 app = FastAPI(title="Tienda API")
@@ -20,3 +20,4 @@ app.include_router(ventas.router,    prefix="/api/ventas",    tags=["ventas"])
 app.include_router(categorias.router, prefix="/api/categorias", tags=["categorias"])
 app.include_router(empleados.router, prefix="/api/empleados", tags=["empleados"])
 app.include_router(clientes.router, prefix="/api/clientes", tags=["clientes"])
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])

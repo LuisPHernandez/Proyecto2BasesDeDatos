@@ -1,7 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from services import productos as service
 from typing import List
+from sqlalchemy.orm import Session
+from database import get_db
 
 router = APIRouter()
 
@@ -71,7 +73,7 @@ class ProductoTop(BaseModel):
     summary="Obtener todos los productos",
     description="Devuelve una lista de todos los productos con información detallada, incluyendo proveedor y categoría."
 )
-def get_all():
+def get_all(db: Session = Depends(get_db)):
     """
     Obtiene todos los productos disponibles.
 
@@ -81,7 +83,7 @@ def get_all():
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_all()
+    return service.get_all(db)
 
 @router.get(
     "/low-stock",
@@ -90,7 +92,7 @@ def get_all():
     summary="Obtener IDs de productos con bajo stock",
     description="Devuelve una lista de IDs de productos con stock menor al umbral definido que han sido vendidos al menos una vez."
 )
-def get_low_stock():
+def get_low_stock(db: Session = Depends(get_db)):
     """
     Returns:
         List[int]: IDs de productos con bajo stock.
@@ -98,7 +100,7 @@ def get_low_stock():
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_low_stock()
+    return service.get_low_stock(db)
 
 @router.get(
     "/top-mes",
@@ -107,7 +109,7 @@ def get_low_stock():
     summary="Top 5 productos más vendidos del mes",
     description="Devuelve los 5 productos más vendidos del mes actual usando CTE."
 )
-def get_top_mes():
+def get_top_mes(db: Session = Depends(get_db)):
     """
     Returns:
         List[ProductoTop]: Top 5 productos del mes.
@@ -115,7 +117,7 @@ def get_top_mes():
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_top_mes()
+    return service.get_top_mes(db)
 
 @router.get(
     "/{id}",
@@ -124,7 +126,7 @@ def get_top_mes():
     summary="Obtener producto por ID",
     description="Devuelve la información detallada de un producto específico utilizando su identificador."
 )
-def get_by_id(id: int):
+def get_by_id(id: int, db: Session = Depends(get_db)):
     """
     Obtiene un producto por su ID.
 
@@ -138,7 +140,7 @@ def get_by_id(id: int):
         HTTPException: Si el producto no existe (404).
         HTTPException: Si ocurre un error en la base de datos (500).
     """
-    return service.get_by_id(id)
+    return service.get_by_id(id, db)
 
 @router.post(
     "/",
@@ -147,7 +149,7 @@ def get_by_id(id: int):
     summary="Crear producto",
     description="Crea un nuevo producto."
 )
-def create(p: ProductoBase):
+def create(p: ProductoBase, db: Session = Depends(get_db)):
     """
     Crea un nuevo producto.
 
@@ -160,7 +162,7 @@ def create(p: ProductoBase):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.create(p.id_proveedor, p.nombre, p.unidades_disponibles, p.precio_venta, p.precio_compra, p.id_categoria)
+    return service.create(p.id_proveedor, p.nombre, p.unidades_disponibles, p.precio_venta, p.precio_compra, p.id_categoria, db)
 
 @router.put(
     "/{id}",
@@ -169,7 +171,7 @@ def create(p: ProductoBase):
     summary="Actualizar producto",
     description="Actualiza la información de un producto existente."
 )
-def update(id: int, p: ProductoBase):
+def update(id: int, p: ProductoBase, db: Session = Depends(get_db)):
     """
     Actualiza un producto existente.
 
@@ -184,7 +186,7 @@ def update(id: int, p: ProductoBase):
         HTTPException: Si el producto no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.update(id, p.id_proveedor, p.nombre, p.unidades_disponibles, p.precio_venta, p.precio_compra, p.id_categoria)
+    return service.update(id, p.id_proveedor, p.nombre, p.unidades_disponibles, p.precio_venta, p.precio_compra, p.id_categoria, db)
 
 @router.delete(
     "/{id}",
@@ -192,7 +194,7 @@ def update(id: int, p: ProductoBase):
     summary="Eliminar producto",
     description="Elimina un producto del sistema."
 )
-def delete(id: int):
+def delete(id: int, db: Session = Depends(get_db)):
     """
     Elimina un producto por su ID.
 
@@ -203,4 +205,4 @@ def delete(id: int):
         HTTPException: Si el producto no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    service.delete(id)
+    service.delete(id, db)

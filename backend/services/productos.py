@@ -1,10 +1,9 @@
 from repositories import productos as repo
-from fastapi import HTTPException, Depends # pyrefly: ignore [missing-import]
+from fastapi import HTTPException # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
 from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
-from database import get_db
 
-def get_all(db: Session = Depends(get_db)):
+def get_all(db: Session):
     """
     Obtiene todos los productos.
 
@@ -22,7 +21,7 @@ def get_all(db: Session = Depends(get_db)):
             detail="Error de base de datos al obtener los productos"
         )
 
-def get_low_stock(db: Session = Depends(get_db)):
+def get_low_stock(db: Session):
     """
     Obtiene los productos con bajo stock.
 
@@ -40,7 +39,7 @@ def get_low_stock(db: Session = Depends(get_db)):
             detail="Error de base de datos al obtener los productos con bajo stock"
         )
 
-def get_top_mes(db: Session = Depends(get_db)):
+def get_top_mes(db: Session):
     """
     Obtiene los productos más vendidos del mes.
 
@@ -58,7 +57,7 @@ def get_top_mes(db: Session = Depends(get_db)):
             detail="Error de base de datos al obtener los productos más vendidos"
         )
 
-def get_by_id(id: int, db: Session = Depends(get_db)):
+def get_by_id(id: int, db: Session):
     """
     Obtiene un producto por su ID.
 
@@ -83,7 +82,7 @@ def get_by_id(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return p
 
-def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int, db: Session = Depends(get_db)):
+def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int, db: Session):
     """
     Crea un nuevo producto.
 
@@ -109,7 +108,7 @@ def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_ven
             detail="Error de base de datos al crear el producto"
         )
 
-def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int, db: Session = Depends(get_db)):
+def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int, db: Session):
     """
     Actualiza un producto existente.
 
@@ -140,7 +139,7 @@ def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, p
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return p
 
-def delete(id: int, db: Session = Depends(get_db)):
+def delete(id: int, db: Session):
     """
     Elimina un producto por su ID.
 

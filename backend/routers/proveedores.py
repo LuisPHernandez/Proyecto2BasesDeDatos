@@ -1,6 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import List
+from sqlalchemy.orm import Session
+from database import get_db
 from services import proveedores as service
 
 router = APIRouter()
@@ -34,7 +36,7 @@ class Proveedor(ProveedorBase):
     summary="Obtener todos los proveedores",
     description="Devuelve una lista de todos los proveedores disponibles."
 )
-def get_all():
+def get_all(db: Session = Depends(get_db)):
     """
     Obtiene todos los proveedores.
 
@@ -44,7 +46,7 @@ def get_all():
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_all()
+    return service.get_all(db)
 
 @router.post(
     "/",
@@ -53,7 +55,7 @@ def get_all():
     summary="Crear proveedor",
     description="Crea un nuevo proveedor."
 )
-def create(p: ProveedorBase):
+def create(p: ProveedorBase, db: Session = Depends(get_db)):
     """
     Crea un nuevo proveedor.
 
@@ -66,7 +68,7 @@ def create(p: ProveedorBase):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.create(p.nombre, p.email)
+    return service.create(p.nombre, p.email, db)
 
 @router.put(
     "/{id}",
@@ -75,7 +77,7 @@ def create(p: ProveedorBase):
     summary="Actualizar proveedor",
     description="Actualiza la información de un proveedor existente."
 )
-def update(id: int, p: ProveedorBase):
+def update(id: int, p: ProveedorBase, db: Session = Depends(get_db)):
     """
     Actualiza un proveedor existente.
 
@@ -90,7 +92,7 @@ def update(id: int, p: ProveedorBase):
         HTTPException: Si el proveedor no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.update(id, p.nombre, p.email)
+    return service.update(id, p.nombre, p.email, db)
 
 @router.delete(
     "/{id}",
@@ -98,7 +100,7 @@ def update(id: int, p: ProveedorBase):
     summary="Eliminar proveedor",
     description="Elimina un proveedor del sistema."
 )
-def delete(id: int):
+def delete(id: int, db: Session = Depends(get_db)):
     """
     Elimina un proveedor por su ID.
 
@@ -109,4 +111,4 @@ def delete(id: int):
         HTTPException: Si el proveedor no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    service.delete(id)
+    service.delete(id, db)

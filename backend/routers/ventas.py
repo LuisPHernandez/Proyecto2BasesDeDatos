@@ -1,8 +1,10 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from services import ventas as service
 from typing import List
 from datetime import datetime
+from sqlalchemy.orm import Session
+from database import get_db
 
 router = APIRouter()
 
@@ -75,7 +77,7 @@ class VentaCreateInput(BaseModel):
     summary="Obtener todas las ventas realizadas en un rango de fechas",
     description="Devuelve una lista de todas las ventas realizadas en un rango de fechas."
 )
-def get_all(fecha_inicio: datetime, fecha_fin: datetime):
+def get_all(fecha_inicio: datetime, fecha_fin: datetime, db: Session = Depends(get_db)):
     """
     Obtiene todas las ventas realizadas en un rango de fechas.
 
@@ -89,7 +91,7 @@ def get_all(fecha_inicio: datetime, fecha_fin: datetime):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_all(fecha_inicio, fecha_fin)
+    return service.get_all(fecha_inicio, fecha_fin, db)
 
 @router.get(
     "/{id}",
@@ -98,7 +100,7 @@ def get_all(fecha_inicio: datetime, fecha_fin: datetime):
     summary="Obtener una venta por ID",
     description="Devuelve una venta con todos su información básica."
 )
-def get_by_id(id: int):
+def get_by_id(id: int, db: Session = Depends(get_db)):
     """
     Obtiene una venta por ID.
 
@@ -111,7 +113,7 @@ def get_by_id(id: int):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_by_id(id)
+    return service.get_by_id(id, db)
 
 @router.get(
     "/{id}/productos",
@@ -120,7 +122,7 @@ def get_by_id(id: int):
     summary="Obtener los productos de una venta por ID",
     description="Devuelve una lista de productos de una venta."
 )
-def get_productos_by_id(id: int):
+def get_productos_by_id(id: int, db: Session = Depends(get_db)):
     """
     Obtiene los productos de una venta por ID.
 
@@ -133,7 +135,7 @@ def get_productos_by_id(id: int):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_productos_by_id(id)
+    return service.get_productos_by_id(id, db)
 
 @router.post(
     "/",
@@ -142,7 +144,7 @@ def get_productos_by_id(id: int):
     summary="Crear una venta con sus productos",
     description="Crea una nueva venta con todos sus productos en una transacción."
 )
-def create(v: VentaCreateInput):
+def create(v: VentaCreateInput, db: Session = Depends(get_db)):
     """
     Crea una nueva venta.
 
@@ -155,7 +157,7 @@ def create(v: VentaCreateInput):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.create(v.id_cliente, v.id_empleado, v.fecha, v.productos)
+    return service.create(v.id_cliente, v.id_empleado, v.fecha, v.productos, db)
 
 @router.delete(
     "/{id}",
@@ -163,7 +165,7 @@ def create(v: VentaCreateInput):
     summary="Eliminar una venta",
     description="Elimina una venta por ID."
 )
-def delete(id: int):
+def delete(id: int, db: Session = Depends(get_db)):
     """
     Elimina una venta por ID.
 
@@ -173,4 +175,4 @@ def delete(id: int):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    service.delete(id)
+    service.delete(id, db)

@@ -1,6 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import List
+from sqlalchemy.orm import Session
+from database import get_db
 from services import clientes as service
 
 router = APIRouter()
@@ -34,7 +36,7 @@ class Cliente(ClienteBase):
     summary="Obtener todos los clientes",
     description="Devuelve una lista de todos los clientes disponibles."
 )
-def get_all():
+def get_all(db: Session = Depends(get_db)):
     """
     Obtiene todos los clientes.
 
@@ -44,7 +46,7 @@ def get_all():
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_all()
+    return service.get_all(db)
 
 @router.get(
     "/activos",
@@ -53,7 +55,7 @@ def get_all():
     summary="Obtener clientes activos",
     description="Devuelve una lista de clientes que han realizado compras en el último mes."
 )
-def get_active():
+def get_active(db: Session = Depends(get_db)):
     """
     Obtiene los clientes activos.
 
@@ -63,7 +65,7 @@ def get_active():
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_active()
+    return service.get_active(db)
 
 @router.post(
     "/",
@@ -72,7 +74,7 @@ def get_active():
     summary="Crear cliente",
     description="Crea un nuevo cliente."
 )
-def create(c: ClienteBase):
+def create(c: ClienteBase, db: Session = Depends(get_db)):
     """
     Crea un nuevo cliente.
 
@@ -85,7 +87,7 @@ def create(c: ClienteBase):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.create(c.nombre, c.email)
+    return service.create(c.nombre, c.email, db)
 
 @router.put(
     "/{id}",
@@ -94,7 +96,7 @@ def create(c: ClienteBase):
     summary="Actualizar cliente",
     description="Actualiza la información de un cliente existente."
 )
-def update(id: int, c: ClienteBase):
+def update(id: int, c: ClienteBase, db: Session = Depends(get_db)):
     """
     Actualiza un cliente existente.
 
@@ -109,7 +111,7 @@ def update(id: int, c: ClienteBase):
         HTTPException: Si el cliente no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.update(id, c.nombre, c.email)
+    return service.update(id, c.nombre, c.email, db)
 
 @router.delete(
     "/{id}",
@@ -117,7 +119,7 @@ def update(id: int, c: ClienteBase):
     summary="Eliminar cliente",
     description="Elimina un cliente del sistema."
 )
-def delete(id: int):
+def delete(id: int, db: Session = Depends(get_db)):
     """
     Elimina un cliente por su ID.
 
@@ -128,4 +130,4 @@ def delete(id: int):
         HTTPException: Si el cliente no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    service.delete(id)
+    service.delete(id, db)

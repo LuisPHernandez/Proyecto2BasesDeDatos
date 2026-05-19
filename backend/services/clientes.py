@@ -1,10 +1,9 @@
 from repositories import clientes as repo
-from fastapi import HTTPException, Depends # pyrefly: ignore [missing-import]
+from fastapi import HTTPException # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
 from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
-from database import get_db
 
-def get_all(db: Session = Depends(get_db)):
+def get_all(db: Session):
     """
     Obtiene todos los clientes.
 
@@ -22,7 +21,7 @@ def get_all(db: Session = Depends(get_db)):
             detail="Error de base de datos al obtener los clientes"
         )
 
-def get_active(db: Session = Depends(get_db)):
+def get_active(db: Session):
     """
     Obtiene los clientes activos.
 
@@ -40,7 +39,7 @@ def get_active(db: Session = Depends(get_db)):
             detail="Error de base de datos al obtener los clientes activos"
         )
 
-def create(nombre: str, email: str, db: Session = Depends(get_db)):
+def create(nombre: str, email: str, db: Session):
     """
     Crea un nuevo cliente.
 
@@ -62,7 +61,7 @@ def create(nombre: str, email: str, db: Session = Depends(get_db)):
             detail="Error de base de datos al crear el cliente"
         )
 
-def update(id: int, nombre: str, email: str, db: Session = Depends(get_db)):
+def update(id: int, nombre: str, email: str, db: Session):
     """
     Actualiza un cliente existente.
 
@@ -89,7 +88,7 @@ def update(id: int, nombre: str, email: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Cliente no encontrado")
     return p
 
-def delete(id: int, db: Session = Depends(get_db)):
+def delete(id: int, db: Session):
     """
     Elimina un cliente por su ID.
 

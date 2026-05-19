@@ -1,6 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import List
+from sqlalchemy.orm import Session
+from database import get_db
 from services import categorias as service
 
 router = APIRouter()
@@ -43,7 +45,7 @@ class CategoriaConIngresos(Categoria):
     summary="Obtener todas las categorías",
     description="Devuelve una lista de todas las categorías disponibles."
 )
-def get_all():
+def get_all(db: Session = Depends(get_db)):
     """
     Obtiene todas las categorías.
 
@@ -53,7 +55,7 @@ def get_all():
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_all()
+    return service.get_all(db)
 
 @router.get(
     "/ingresos",
@@ -62,7 +64,7 @@ def get_all():
     summary="Obtener categorías con sus ingresos",
     description="Devuelve una lista de todas las categorías con sus ingresos."
 )
-def get_income():
+def get_income(db: Session = Depends(get_db)):
     """
     Obtiene las categorías con sus ingresos.
 
@@ -72,7 +74,7 @@ def get_income():
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_income()
+    return service.get_income(db)
 
 @router.post(
     "/",
@@ -81,7 +83,7 @@ def get_income():
     summary="Crear categoría",
     description="Crea una nueva categoría."
 )
-def create(c: CategoriaBase):
+def create(c: CategoriaBase, db: Session = Depends(get_db)):
     """
     Crea una nueva categoría.
 
@@ -94,7 +96,7 @@ def create(c: CategoriaBase):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.create(c.nombre)
+    return service.create(c.nombre, db)
 
 @router.put(
     "/{id}",
@@ -103,7 +105,7 @@ def create(c: CategoriaBase):
     summary="Actualizar categoría",
     description="Actualiza la información de una categoría existente."
 )
-def update(id: int, c: CategoriaBase):
+def update(id: int, c: CategoriaBase, db: Session = Depends(get_db)):
     """
     Actualiza una categoría existente.
 
@@ -118,7 +120,7 @@ def update(id: int, c: CategoriaBase):
         HTTPException: Si la categoría no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.update(id, c.nombre)
+    return service.update(id, c.nombre, db)
 
 @router.delete(
     "/{id}",
@@ -126,7 +128,7 @@ def update(id: int, c: CategoriaBase):
     summary="Eliminar categoría",
     description="Elimina una categoría del sistema."
 )
-def delete(id: int):
+def delete(id: int, db: Session = Depends(get_db)):
     """
     Elimina una categoría por su ID.
 
@@ -137,4 +139,4 @@ def delete(id: int):
         HTTPException: Si la categoría no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    service.delete(id)
+    service.delete(id, db)

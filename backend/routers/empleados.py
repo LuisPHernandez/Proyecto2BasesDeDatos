@@ -1,6 +1,8 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import List
+from sqlalchemy.orm import Session
+from database import get_db
 from services import empleados as service
 
 router = APIRouter()
@@ -45,7 +47,7 @@ class EmpleadoSales(Empleado):
     summary="Obtener todos los empleados",
     description="Devuelve una lista de todos los empleados disponibles y su total de ventas e ingresos generado."
 )
-def get_all():
+def get_all(db: Session = Depends(get_db)):
     """
     Obtiene todos los empleados.
 
@@ -55,7 +57,7 @@ def get_all():
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.get_all()
+    return service.get_all(db)
 
 @router.post(
     "/",
@@ -64,7 +66,7 @@ def get_all():
     summary="Crear empleado",
     description="Crea un nuevo empleado."
 )
-def create(e: EmpleadoBase):
+def create(e: EmpleadoBase, db: Session = Depends(get_db)):
     """
     Crea un nuevo empleado.
 
@@ -77,7 +79,7 @@ def create(e: EmpleadoBase):
     Raises:
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.create(e.nombre)
+    return service.create(e.nombre, db)
 
 @router.put(
     "/{id}",
@@ -86,7 +88,7 @@ def create(e: EmpleadoBase):
     summary="Actualizar empleado",
     description="Actualiza la información de un empleado existente."
 )
-def update(id: int, e: EmpleadoBase):
+def update(id: int, e: EmpleadoBase, db: Session = Depends(get_db)):
     """
     Actualiza un empleado existente.
 
@@ -101,7 +103,7 @@ def update(id: int, e: EmpleadoBase):
         HTTPException: Si el empleado no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    return service.update(id, e.nombre)
+    return service.update(id, e.nombre, db)
 
 @router.delete(
     "/{id}",
@@ -109,7 +111,7 @@ def update(id: int, e: EmpleadoBase):
     summary="Eliminar empleado",
     description="Elimina un empleado del sistema."
 )
-def delete(id: int):
+def delete(id: int, db: Session = Depends(get_db)):
     """
     Elimina un empleado por su ID.
 
@@ -120,4 +122,4 @@ def delete(id: int):
         HTTPException: Si el empleado no existe (404).
         HTTPException: Si ocurre un error interno (500).
     """
-    service.delete(id)
+    service.delete(id, db)

@@ -1,10 +1,9 @@
 from repositories import empleados as repo
-from fastapi import HTTPException, Depends # pyrefly: ignore [missing-import]
+from fastapi import HTTPException # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
 from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
-from database import get_db
 
-def get_all(db: Session = Depends(get_db)):
+def get_all(db: Session):
     """
     Obtiene todos los empleados.
 
@@ -22,7 +21,7 @@ def get_all(db: Session = Depends(get_db)):
             detail="Error de base de datos al obtener los empleados"
         )
 
-def create(nombre: str, db: Session = Depends(get_db)):
+def create(nombre: str, db: Session):
     """
     Crea un nuevo empleado.
 
@@ -43,7 +42,7 @@ def create(nombre: str, db: Session = Depends(get_db)):
             detail="Error de base de datos al crear el empleado"
         )
 
-def update(id: int, nombre: str, db: Session = Depends(get_db)):
+def update(id: int, nombre: str, db: Session):
     """
     Actualiza un empleado existente.
 
@@ -69,7 +68,7 @@ def update(id: int, nombre: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Empleado no encontrado")
     return p
 
-def delete(id: int, db: Session = Depends(get_db)):
+def delete(id: int, db: Session):
     """
     Elimina un empleado por su ID.
 

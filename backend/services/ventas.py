@@ -1,11 +1,10 @@
 from repositories import ventas as repo
-from fastapi import HTTPException, Depends # pyrefly: ignore [missing-import]
+from fastapi import HTTPException # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
 from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
-from database import get_db
 from datetime import datetime
 
-def get_all(fecha_inicio: datetime, fecha_fin: datetime, db: Session = Depends(get_db)):
+def get_all(fecha_inicio: datetime, fecha_fin: datetime, db: Session):
     """
     Obtiene todas las ventas realizadas en un rango de fechas.
 
@@ -27,7 +26,7 @@ def get_all(fecha_inicio: datetime, fecha_fin: datetime, db: Session = Depends(g
             detail="Error de base de datos al obtener las ventas"
         )
 
-def get_by_id(id: int, db: Session = Depends(get_db)):
+def get_by_id(id: int, db: Session):
     """
     Obtiene una venta por ID.
 
@@ -52,7 +51,7 @@ def get_by_id(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Venta no encontrada")
     return v
 
-def get_productos_by_id(id: int, db: Session = Depends(get_db)):
+def get_productos_by_id(id: int, db: Session):
     """
     Obtiene los productos de una venta por ID.
 
@@ -73,7 +72,7 @@ def get_productos_by_id(id: int, db: Session = Depends(get_db)):
             detail="Error de base de datos al obtener los productos de la venta"
         )
 
-def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, db: Session = Depends(get_db)):
+def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, db: Session):
     """
     Crea una nueva venta.
 
@@ -96,7 +95,7 @@ def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, 
     except SQLAlchemyError:
         raise HTTPException(status_code=500, detail="Error de base de datos al crear la venta")
 
-def delete(id: int, db: Session = Depends(get_db)):
+def delete(id: int, db: Session):
     """
     Elimina una venta por su ID.
 

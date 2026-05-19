@@ -1,10 +1,9 @@
 from repositories import categorias as repo
-from fastapi import HTTPException, Depends # pyrefly: ignore [missing-import]
+from fastapi import HTTPException # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
 from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
-from database import get_db
 
-def get_all(db: Session = Depends(get_db)):
+def get_all(db: Session):
     """
     Obtiene todas las categorías.
 
@@ -22,7 +21,7 @@ def get_all(db: Session = Depends(get_db)):
             detail="Error de base de datos al obtener las categorías"
         )
 
-def get_income(db: Session = Depends(get_db)):
+def get_income(db: Session):
     """
     Obtiene las categorías con sus ingresos.
 
@@ -40,7 +39,7 @@ def get_income(db: Session = Depends(get_db)):
             detail="Error de base de datos al obtener las categorías con sus ingresos"
         )
 
-def create(nombre: str, db: Session = Depends(get_db)):
+def create(nombre: str, db: Session):
     """
     Crea una nueva categoría.
 
@@ -61,7 +60,7 @@ def create(nombre: str, db: Session = Depends(get_db)):
             detail="Error de base de datos al crear la categoría"
         )
 
-def update(id: int, nombre: str, db: Session = Depends(get_db)):
+def update(id: int, nombre: str, db: Session):
     """
     Actualiza una categoría existente.
 
@@ -87,7 +86,7 @@ def update(id: int, nombre: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Categoría no encontrada")
     return p
 
-def delete(id: int, db: Session = Depends(get_db)):
+def delete(id: int, db: Session):
     """
     Elimina una categoría por su ID.
 

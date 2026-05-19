@@ -102,13 +102,13 @@ granulares por tabla asignados con `GRANT` y `REVOKE`.
 |---|---|
 | `rol_admin` | Control total sobre todas las tablas y sequences |
 | `rol_gerente` | Lectura total, incluyendo `precio_compra` y reportes |
-| `rol_cajero` | Crea ventas; ve productos sin `precio_compra` |
+| `rol_vendedor` | Crea ventas; ve productos sin `precio_compra` |
 | `rol_bodeguero` | Gestiona productos y categorías; no accede a datos financieros |
 | `rol_auditor` | Solo lectura sobre todas las tablas; no puede modificar nada |
 
 ### Permisos por tabla
 
-| Tabla | rol_admin | rol_gerente | rol_cajero | rol_bodeguero | rol_auditor |
+| Tabla | rol_admin | rol_gerente | rol_vendedor | rol_bodeguero | rol_auditor |
 |---|---|---|---|---|---|
 | `proveedor` | ALL | SELECT | — | SELECT | SELECT |
 | `categoria` | ALL | SELECT | — | SELECT, INSERT, UPDATE | SELECT |
@@ -119,6 +119,6 @@ granulares por tabla asignados con `GRANT` y `REVOKE`.
 | `detalle_venta` | ALL | SELECT | SELECT, INSERT | SELECT | SELECT |
 | `venta_detallada` (VIEW) | ALL | SELECT | — | — | SELECT |
 
-> \* `rol_cajero` tiene acceso a columna-nivel en `producto`:
+> \* `rol_vendedor` tiene acceso a columna-nivel en `producto`:
 > puede ver `id_producto`, `nombre`, `unidades_disponibles`,
 > `precio_venta` e `id_categoria`, pero **no** `precio_compra`.

@@ -1,15 +1,16 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
+import { canAccess, routeRoles, type AppRole } from "../../auth/permissions"
 import { useAuth } from "../../context/useAuth"
 import styles from './Navbar.module.css'
 
-const links = [
-    { to: "/", label: "Home" },
-    { to: "/inventario", label: "Inventario" },
-    { to: "/proveedores", label: "Proveedores" },
-    { to: "/categorias", label: "Categorias" },
-    { to: "/ventas", label: "Ventas" },
-    { to: "/clientes", label: "Clientes" },
-    { to: "/empleados", label: "Empleados" }
+const links: { to: string; label: string; roles: AppRole[] }[] = [
+    { to: "/", label: "Home", roles: routeRoles.home },
+    { to: "/inventario", label: "Inventario", roles: routeRoles.inventario },
+    { to: "/proveedores", label: "Proveedores", roles: routeRoles.proveedores },
+    { to: "/categorias", label: "Categorias", roles: routeRoles.categorias },
+    { to: "/ventas", label: "Ventas", roles: routeRoles.ventas },
+    { to: "/clientes", label: "Clientes", roles: routeRoles.clientes },
+    { to: "/empleados", label: "Empleados", roles: routeRoles.empleados }
 ]
 
 function Navbar() {
@@ -21,11 +22,13 @@ function Navbar() {
         navigate('/login')
     }
 
+    const visibleLinks = links.filter(link => canAccess(user?.rol, link.roles))
+
     return (
         <div>
             <nav className={styles.navbar}>
                 <ul className={styles.navList}>
-                    {links.map(link => (
+                    {visibleLinks.map(link => (
                         <li key={link.to} className={styles.navItem}>
                             <NavLink
                                 to={link.to}
@@ -41,7 +44,7 @@ function Navbar() {
                 </ul>
 
                 <div className={styles.session}>
-                    <span>Sesión: {user?.nombre}</span>
+                    <span>Sesión: {user?.nombre} ({user?.rol})</span>
                     <button className={styles.logoutButton} onClick={handleLogout}>
                         Cerrar sesión
                     </button>

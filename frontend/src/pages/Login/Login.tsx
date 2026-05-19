@@ -14,10 +14,10 @@ function Login() {
         return <Navigate to="/" replace />
     }
 
-    const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        const ok = login(username, password)
+        const ok = await login(username, password)
 
         if (!ok) {
             setError('Usuario o contraseña incorrectos')
@@ -60,7 +60,9 @@ function Login() {
                     </button>
                 </form>
 
-                <p className={styles.help}>Usuario: admin | Contraseña: admin123</p>
+                <p className={styles.help}>
+                    admin/admin123 | gerente/gerente123 | vendedor/vendedor123 | bodeguero/bodeguero123 | auditor/auditor123
+                </p>
             </section>
         </main>
     )

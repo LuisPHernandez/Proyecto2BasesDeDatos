@@ -1,14 +1,17 @@
 import { createContext, useMemo, useState } from 'react'
+import { loginRequest, logoutRequest } from '../api/auth'
 
 interface AuthUser {
+    id_usuario: number
     username: string
     nombre: string
+    rol: string
 }
 
 interface AuthContextValue {
     user: AuthUser | null
     isAuthenticated: boolean
-    login: (username: string, password: string) => boolean
+    login: (username: string, password: string) => Promise<boolean>
     logout: () => void
 }
 
@@ -22,22 +25,21 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         return savedUser ? JSON.parse(savedUser) : null
     })
 
-    const login = (username: string, password: string) => {
-        if (username.trim() !== 'admin' || password !== 'admin123') {
+    const login = async (username: string, password: string) => {
+        try {
+            const nextUser = await loginRequest(username, password)
+
+            setUser(nextUser)
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser))
+
+            return true
+        } catch {
             return false
         }
-
-        const nextUser = {
-            username: 'admin',
-            nombre: 'Administrador'
-        }
-
-        setUser(nextUser)
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser))
-        return true
     }
 
     const logout = () => {
+        logoutRequest().catch(() => { })
         setUser(null)
         localStorage.removeItem(STORAGE_KEY)
     }
@@ -60,3 +62,4 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export { AuthContext, AuthProvider }
+

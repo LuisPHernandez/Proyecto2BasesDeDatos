@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION sp_crear_venta(
+CREATE OR REPLACE PROCEDURE sp_crear_venta(
     p_id_cliente INT,
     p_id_empleado INT,
     p_fecha TIMESTAMP,
@@ -27,7 +27,6 @@ EXCEPTION
         RAISE EXCEPTION 'Error al crear venta: %', SQLERRM;
 END;
 $$;
-
 
 CREATE OR REPLACE PROCEDURE sp_insertar_detalle_venta(
     p_id_venta INT,
@@ -81,8 +80,7 @@ EXCEPTION
 END;
 $$;
 
-
-CREATE OR REPLACE FUNCTION sp_crear_producto(
+CREATE OR REPLACE PROCEDURE sp_crear_producto(
     p_id_proveedor INT,
     p_nombre TEXT,
     p_unidades_disponibles INT,
@@ -122,7 +120,6 @@ EXCEPTION
 END;
 $$;
 
-
 CREATE OR REPLACE PROCEDURE sp_actualizar_stock(
     p_id_producto INT,
     p_nuevas_unidades INT
@@ -143,7 +140,6 @@ BEGIN
     END IF;
 END;
 $$;
-
 
 CREATE OR REPLACE PROCEDURE sp_eliminar_venta(
     p_id_venta INT

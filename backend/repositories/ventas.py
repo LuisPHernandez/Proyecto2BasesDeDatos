@@ -128,11 +128,12 @@ def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, 
         total = sum(p["precio_unitario"] * p["cantidad"] for p in productos)
 
         sql_venta = text("""
-            SELECT sp_crear_venta(
+            CALL sp_crear_venta(
                 :id_cliente,
                 :id_empleado,
                 :fecha,
-                :total
+                :total,
+                NULL
             )
         """)
         result = db.execute(sql_venta, {

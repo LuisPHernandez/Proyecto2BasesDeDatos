@@ -159,13 +159,14 @@ def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_ven
     """
     try:
         sql = text("""
-            SELECT sp_crear_producto(
+            CALL sp_crear_producto(
                 :id_proveedor,
                 :nombre,
                 :unidades_disponibles,
                 :precio_venta,
                 :precio_compra,
-                :id_categoria
+                :id_categoria,
+                NULL
             )
         """)
 

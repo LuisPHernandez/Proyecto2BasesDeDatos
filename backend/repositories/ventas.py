@@ -32,7 +32,6 @@ def get_all(fecha_inicio: datetime, fecha_fin: datetime, db: Session):
         print(f"Error de base de datos en get_all ventas: {e}")
         raise
 
-
 def get_by_id(id: int, db: Session):
     """
     Obtiene una venta por su ID con datos de empleado y cliente.
@@ -79,7 +78,6 @@ def get_by_id(id: int, db: Session):
         print(f"Error de base de datos en get_by_id ventas: {e}")
         raise
 
-
 def get_productos_by_id(id: int, db: Session):
     """
     Obtiene los productos de una venta por su ID.
@@ -108,7 +106,6 @@ def get_productos_by_id(id: int, db: Session):
         print(f"Error de base de datos en get_productos_by_id ventas: {e}")
         raise
 
-
 def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, db: Session):
     """
     Crea una nueva venta con su detalle y descuenta el stock.
@@ -130,35 +127,45 @@ def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, 
     try:
         total = sum(p["precio_unitario"] * p["cantidad"] for p in productos)
 
-        with db.begin():
-            venta = Venta(
-                id_cliente=id_cliente,
-                id_empleado=id_empleado,
-                fecha=fecha,
-                total=total,
+        sql_venta = text("""
+            SELECT sp_crear_venta(
+                :id_cliente,
+                :id_empleado,
+                :fecha,
+                :total
             )
-            db.add(venta)
-            db.flush()
+        """)
+        result = db.execute(sql_venta, {
+            "id_cliente": id_cliente,
+            "id_empleado": id_empleado,
+            "fecha": fecha,
+            "total": total,
+        })
 
-            for p in productos:
-                db.add(DetalleVenta(
-                    id_venta=venta.id_venta,
-                    id_producto=p["id_producto"],
-                    precio_unitario=p["precio_unitario"],
-                    cantidad=p["cantidad"],
-                ))
+        id_venta = result.scalar()
 
-                producto = db.query(Producto).filter(Producto.id_producto == p["id_producto"]).first()
-                producto.unidades_disponibles -= p["cantidad"]
+        sql_detalle = text("""
+            CALL sp_insertar_detalle_venta(
+                :id_venta,
+                :id_producto,
+                :cantidad,
+                :precio_unitario
+            )
+        """)
+        for p in productos:
+            db.execute(sql_detalle, {
+                "id_venta": id_venta,
+                "id_producto": p["id_producto"],
+                "cantidad": p["cantidad"],
+                "precio_unitario": p["precio_unitario"],
+            })
 
-                if producto.unidades_disponibles < 0:
-                    raise ValueError(f"Stock insuficiente para producto {p['id_producto']}")
-
-        return get_by_id(venta.id_venta, db)
+        db.commit()
+        return get_by_id(id_venta, db)
     except Exception as e:
+        db.rollback()
         print(f"Error en create ventas: {e}")
         raise
-
 
 def delete(id: int, db: Session):
     """
@@ -179,8 +186,12 @@ def delete(id: int, db: Session):
         if venta is None:
             return None
 
-        db.delete(venta)
+        sql = text("""
+            CALL sp_eliminar_venta(:id_venta)
+        """)
+        db.execute(sql, {"id_venta": id})
         db.commit()
+
         return venta
     except SQLAlchemyError as e:
         db.rollback()

@@ -158,20 +158,31 @@ def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_ven
         DatabaseError: Si ocurre un error al crear el producto.
     """
     try:
-        producto = Producto(
-            id_proveedor=id_proveedor,
-            nombre=nombre,
-            unidades_disponibles=unidades_disponibles,
-            precio_venta=precio_venta,
-            precio_compra=precio_compra,
-            id_categoria=id_categoria,
-        )
+        sql = text("""
+            SELECT sp_crear_producto(
+                :id_proveedor,
+                :nombre,
+                :unidades_disponibles,
+                :precio_venta,
+                :precio_compra,
+                :id_categoria
+            )
+        """)
 
-        db.add(producto)
+        result = db.execute(sql, {
+            "id_proveedor": id_proveedor,
+            "nombre": nombre,
+            "unidades_disponibles": unidades_disponibles,
+            "precio_venta": precio_venta,
+            "precio_compra": precio_compra,
+            "id_categoria": id_categoria
+        })
+
+        id_producto = result.scalar()
         db.commit()
-        db.refresh(producto)
-        return producto
+        return get_by_id(id_producto, db)
     except SQLAlchemyError as e:
+        db.rollback()
         print(f"Error de base de datos en create productos: {e}")
         raise
 
@@ -195,22 +206,36 @@ def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, p
         DatabaseError: Si ocurre un error al actualizar el producto.
     """
     try:
-        producto = db.query(Producto).filter(Producto.id_producto == id).first()
+        producto = db.query(Producto).filter(
+            Producto.id_producto == id
+        ).first()
 
         if producto is None:
             return None
 
         producto.id_proveedor = id_proveedor
         producto.nombre = nombre
-        producto.unidades_disponibles = unidades_disponibles
         producto.precio_venta = precio_venta
         producto.precio_compra = precio_compra
         producto.id_categoria = id_categoria
+
+        sql = text("""
+            CALL sp_actualizar_stock(
+                :id_producto,
+                :unidades
+            )
+        """)
+
+        db.execute(sql, {
+            "id_producto": id,
+            "unidades": unidades_disponibles
+        })
 
         db.commit()
         db.refresh(producto)
         return producto
     except SQLAlchemyError as e:
+        db.rollback()
         print(f"Error de base de datos en update productos: {e}")
         raise
 

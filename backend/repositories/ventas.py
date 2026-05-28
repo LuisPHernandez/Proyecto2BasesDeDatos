@@ -131,9 +131,9 @@ def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, 
             CALL sp_crear_venta(
                 :id_cliente,
                 :id_empleado,
-                :fecha,
+                CAST(:fecha AS TIMESTAMP),
                 :total,
-                NULL
+                CAST(NULL AS INT)
             )
         """)
         result = db.execute(sql_venta, {

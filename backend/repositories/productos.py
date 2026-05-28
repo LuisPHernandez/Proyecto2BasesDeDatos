@@ -166,7 +166,7 @@ def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_ven
                 :precio_venta,
                 :precio_compra,
                 :id_categoria,
-                NULL
+                CAST(NULL AS INT)
             )
         """)
 

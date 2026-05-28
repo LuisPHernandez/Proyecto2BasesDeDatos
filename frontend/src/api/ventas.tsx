@@ -1,4 +1,5 @@
 import type { VentaCreateInput, VentaSummary } from "../types"
+import { apiErrorMessage } from "./errors"
 
 const BASE = '/api/ventas/'
 
@@ -28,14 +29,11 @@ export async function createVenta(data: VentaCreateInput): Promise<VentaSummary>
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-    if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.detail ?? 'Error al crear venta')
-    }
+    if (!res.ok) throw new Error(await apiErrorMessage(res, 'Error al crear venta'))
     return res.json()
 }
 
 export async function deleteVenta(id: number) {
     const res = await fetch(`${BASE}${id}`, { method: 'DELETE' })
-    if (!res.ok) throw new Error('Error al eliminar venta')
+    if (!res.ok) throw new Error(await apiErrorMessage(res, 'Error al eliminar venta'))
 }

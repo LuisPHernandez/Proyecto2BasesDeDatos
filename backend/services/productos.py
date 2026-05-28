@@ -2,6 +2,7 @@ from repositories import productos as repo
 from fastapi import HTTPException # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
 from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
+from services.db_errors import db_error_detail
 
 def get_all(db: Session):
     """
@@ -102,10 +103,10 @@ def create(id_proveedor: int, nombre: str, unidades_disponibles: int, precio_ven
     """
     try:
         return repo.create(id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria, db)
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
         raise HTTPException(
-            status_code=500,
-            detail="Error de base de datos al crear el producto"
+            status_code=400,
+            detail=db_error_detail(e, "Error de base de datos al crear el producto")
         )
 
 def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, precio_venta: float, precio_compra: float, id_categoria: int, db: Session):
@@ -130,10 +131,10 @@ def update(id: int, id_proveedor: int, nombre: str, unidades_disponibles: int, p
     """
     try:
         p = repo.update(id, id_proveedor, nombre, unidades_disponibles, precio_venta, precio_compra, id_categoria, db)
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
         raise HTTPException(
-            status_code=500,
-            detail="Error de base de datos al actualizar el producto"
+            status_code=400,
+            detail=db_error_detail(e, "Error de base de datos al actualizar el producto")
         )
     if p is None:
         raise HTTPException(status_code=404, detail="Producto no encontrado")
@@ -152,10 +153,10 @@ def delete(id: int, db: Session):
     """
     try:
         p = repo.delete(id, db)
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
         raise HTTPException(
-            status_code=500,
-            detail="Error de base de datos al eliminar el producto"
+            status_code=400,
+            detail=db_error_detail(e, "Error de base de datos al eliminar el producto")
         )
     if p is None:
         raise HTTPException(status_code=404, detail="Producto no encontrado")

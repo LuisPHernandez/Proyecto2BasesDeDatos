@@ -1,4 +1,5 @@
 import type { ProductoBase, ProductoTop } from "../types"
+import { apiErrorMessage } from "./errors"
 
 const BASE = '/api/productos/'
 
@@ -32,7 +33,7 @@ export async function createProducto(data: ProductoBase) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-    if (!res.ok) throw new Error('Error al crear producto')
+    if (!res.ok) throw new Error(await apiErrorMessage(res, 'Error al crear producto'))
     return res.json()
 }
 
@@ -42,11 +43,11 @@ export async function updateProducto(id: number, data: ProductoBase) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-    if (!res.ok) throw new Error('Error al actualizar producto')
+    if (!res.ok) throw new Error(await apiErrorMessage(res, 'Error al actualizar producto'))
     return res.json()
 }
 
 export async function deleteProducto(id: number) {
     const res = await fetch(`${BASE}${id}`, { method: 'DELETE' })
-    if (!res.ok) throw new Error('Error al eliminar producto')
+    if (!res.ok) throw new Error(await apiErrorMessage(res, 'Error al eliminar producto'))
 }

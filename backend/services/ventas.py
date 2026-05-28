@@ -3,6 +3,7 @@ from fastapi import HTTPException # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session # pyrefly: ignore [missing-import]
 from sqlalchemy.exc import SQLAlchemyError # pyrefly: ignore [missing-import]
 from datetime import datetime
+from services.db_errors import db_error_detail
 
 def get_all(fecha_inicio: datetime, fecha_fin: datetime, db: Session):
     """
@@ -92,8 +93,8 @@ def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, 
         return repo.create(id_cliente, id_empleado, fecha, [producto.dict() for producto in productos], db)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-    except SQLAlchemyError:
-        raise HTTPException(status_code=500, detail="Error de base de datos al crear la venta")
+    except SQLAlchemyError as e:
+        raise HTTPException(status_code=400, detail=db_error_detail(e, "Error de base de datos al crear la venta"))
 
 def delete(id: int, db: Session):
     """
@@ -108,10 +109,10 @@ def delete(id: int, db: Session):
     """
     try:
         v = repo.delete(id, db)
-    except SQLAlchemyError:
+    except SQLAlchemyError as e:
         raise HTTPException(
-            status_code=500,
-            detail="Error de base de datos al eliminar la venta"
+            status_code=400,
+            detail=db_error_detail(e, "Error de base de datos al eliminar la venta")
         )
     if v is None:
         raise HTTPException(status_code=404, detail="Venta no encontrada")

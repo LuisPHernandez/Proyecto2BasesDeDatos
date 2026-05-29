@@ -151,11 +151,27 @@ BEGIN
     WHERE id_venta = p_id_venta;
 
     IF NOT FOUND THEN
-        RAISE EXCEPTION 'Venta no encontrada';
+        -- Rollback explícito
+        ROLLBACK;
+        RAISE EXCEPTION 'Venta no encontrada. Transaccion revertida';
     END IF;
 
-EXCEPTION
-    WHEN OTHERS THEN
-        RAISE EXCEPTION 'Error al eliminar venta: %', SQLERRM;
+    -- Commit explícito
+    COMMIT;
 END;
 $$;
+
+-- Permisos para los stored procedures
+GRANT EXECUTE ON PROCEDURE sp_crear_venta(INT, INT, TIMESTAMP, NUMERIC) TO rol_admin;
+GRANT EXECUTE ON PROCEDURE sp_crear_venta(INT, INT, TIMESTAMP, NUMERIC) TO rol_vendedor;
+
+GRANT EXECUTE ON PROCEDURE sp_insertar_detalle_venta(INT, INT, INT, NUMERIC) TO rol_admin;
+GRANT EXECUTE ON PROCEDURE sp_insertar_detalle_venta(INT, INT, INT, NUMERIC) TO rol_vendedor;
+
+GRANT EXECUTE ON PROCEDURE sp_crear_producto(INT, TEXT, INT, NUMERIC, NUMERIC, INT) TO rol_admin;
+GRANT EXECUTE ON PROCEDURE sp_crear_producto(INT, TEXT, INT, NUMERIC, NUMERIC, INT) TO rol_bodeguero;
+
+GRANT EXECUTE ON PROCEDURE sp_actualizar_stock(INT, INT) TO rol_admin;
+GRANT EXECUTE ON PROCEDURE sp_actualizar_stock(INT, INT) TO rol_bodeguero;
+
+GRANT EXECUTE ON PROCEDURE sp_eliminar_venta(INT) TO rol_admin;

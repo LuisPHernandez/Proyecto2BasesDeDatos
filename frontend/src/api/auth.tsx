@@ -1,3 +1,5 @@
+﻿import { AUTH_STORAGE_KEY, getSessionToken } from "./client"
+
 const BASE = "/api/auth"
 
 export interface AuthUser {
@@ -5,6 +7,7 @@ export interface AuthUser {
     username: string
     nombre: string
     rol: string
+    session_token: string
 }
 
 export async function loginRequest(username: string, password: string): Promise<AuthUser> {
@@ -25,7 +28,12 @@ export async function loginRequest(username: string, password: string): Promise<
 }
 
 export async function logoutRequest() {
+    const token = getSessionToken()
+
     await fetch(`${BASE}/logout`, {
         method: "POST",
+        headers: token ? { "X-Session-Token": token } : {},
     })
+
+    localStorage.removeItem(AUTH_STORAGE_KEY)
 }

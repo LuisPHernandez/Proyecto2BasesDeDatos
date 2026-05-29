@@ -1,6 +1,7 @@
 from sqlalchemy import text  # pyrefly: ignore [missing-import]
 from sqlalchemy.orm import Session  # pyrefly: ignore [missing-import]
 from sqlalchemy.exc import SQLAlchemyError  # pyrefly: ignore [missing-import]
+from database import engine
 from models import Venta, DetalleVenta, Producto, Empleado, Cliente
 from datetime import datetime
 
@@ -170,16 +171,11 @@ def create(id_cliente: int, id_empleado: int, fecha: datetime, productos: list, 
 
 def delete(id: int, db: Session):
     """
-    Elimina una venta por su ID.
+    Elimina una venta por su ID usando un stored procedure con control
+    transaccional propio.
 
-    Args:
-        id (int): ID de la venta.
-
-    Returns:
-        Venta | None: Venta eliminada o None si no existe.
-
-    Raises:
-        SQLAlchemyError: Si ocurre un error en la base de datos.
+    sp_eliminar_venta ejecuta COMMIT/ROLLBACK dentro del procedure, por lo
+    que debe llamarse con una conexion AUTOCOMMIT y no desde la Session normal.
     """
     try:
         venta = db.query(Venta).filter(Venta.id_venta == id).first()
@@ -187,13 +183,29 @@ def delete(id: int, db: Session):
         if venta is None:
             return None
 
-        sql = text("""
-            CALL sp_eliminar_venta(:id_venta)
-        """)
-        db.execute(sql, {"id_venta": id})
-        db.commit()
+        venta_eliminada = {
+            "id_venta": venta.id_venta,
+            "id_empleado": venta.id_empleado,
+            "id_cliente": venta.id_cliente,
+            "fecha": venta.fecha,
+            "total": venta.total,
+        }
 
-        return venta
+        sql = text("CALL sp_eliminar_venta(:id_venta)")
+
+        db_role = db.info.get("db_role")
+
+        with engine.connect().execution_options(isolation_level="AUTOCOMMIT") as conn:
+            if db_role is not None:
+                conn.execute(text(f"SET ROLE {db_role}"))
+
+            try:
+                conn.execute(sql, {"id_venta": id})
+            finally:
+                if db_role is not None:
+                    conn.execute(text("RESET ROLE"))
+
+        return venta_eliminada
     except SQLAlchemyError as e:
         db.rollback()
         print(f"Error de base de datos en delete ventas: {e}")

@@ -1,12 +1,6 @@
-import { createContext, useMemo, useState } from 'react'
-import { loginRequest, logoutRequest } from '../api/auth'
-
-interface AuthUser {
-    id_usuario: number
-    username: string
-    nombre: string
-    rol: string
-}
+﻿import { createContext, useMemo, useState } from 'react'
+import { loginRequest, logoutRequest, type AuthUser } from '../api/auth'
+import { AUTH_STORAGE_KEY } from '../api/client'
 
 interface AuthContextValue {
     user: AuthUser | null
@@ -15,13 +9,11 @@ interface AuthContextValue {
     logout: () => void
 }
 
-const STORAGE_KEY = 'tienda-auth-user'
-
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(() => {
-        const savedUser = localStorage.getItem(STORAGE_KEY)
+        const savedUser = localStorage.getItem(AUTH_STORAGE_KEY)
         return savedUser ? JSON.parse(savedUser) : null
     })
 
@@ -30,7 +22,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
             const nextUser = await loginRequest(username, password)
 
             setUser(nextUser)
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(nextUser))
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(nextUser))
 
             return true
         } catch {
@@ -41,7 +33,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     const logout = () => {
         logoutRequest().catch(() => { })
         setUser(null)
-        localStorage.removeItem(STORAGE_KEY)
+        localStorage.removeItem(AUTH_STORAGE_KEY)
     }
 
     const value = useMemo(
@@ -62,4 +54,3 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export { AuthContext, AuthProvider }
-

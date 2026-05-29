@@ -1,21 +1,22 @@
+﻿import { apiFetch } from "./client"
 import type { CategoriaBase, CategoriaIncome } from "../types"
 
 const BASE = '/api/categorias/'
 
 export async function getCategorias() {
-    const res = await fetch(BASE)
+    const res = await apiFetch(BASE)
     if (!res.ok) throw new Error('Error al obtener categorias')
     return res.json()
 }
 
 export async function getCategoriasWithIncome(): Promise<CategoriaIncome[]> {
-    const res = await fetch(`${BASE}ingresos`)
+    const res = await apiFetch(`${BASE}ingresos`)
     if (!res.ok) throw new Error('Error al obtener categorias con sus ingresos')
     return res.json()
 }
 
 export async function createCategoria(data: CategoriaBase) {
-    const res = await fetch(BASE, {
+    const res = await apiFetch(BASE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -25,7 +26,7 @@ export async function createCategoria(data: CategoriaBase) {
 }
 
 export async function updateCategoria(id: number, data: CategoriaBase) {
-    const res = await fetch(`${BASE}${id}`, {
+    const res = await apiFetch(`${BASE}${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -35,6 +36,6 @@ export async function updateCategoria(id: number, data: CategoriaBase) {
 }
 
 export async function deleteCategoria(id: number) {
-    const res = await fetch(`${BASE}${id}`, { method: 'DELETE' })
+    const res = await apiFetch(`${BASE}${id}`, { method: 'DELETE' })
     if (!res.ok) throw new Error('Error al eliminar categoria')
 }

@@ -1,15 +1,16 @@
+﻿import { apiFetch } from "./client"
 import type { ProveedorBase } from "../types"
 
 const BASE = '/api/proveedores/'
 
 export async function getProveedores() {
-    const res = await fetch(BASE)
+    const res = await apiFetch(BASE)
     if (!res.ok) throw new Error('Error al obtener proveedores')
     return res.json()
 }
 
 export async function createProveedor(data: ProveedorBase) {
-    const res = await fetch(BASE, {
+    const res = await apiFetch(BASE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -19,7 +20,7 @@ export async function createProveedor(data: ProveedorBase) {
 }
 
 export async function updateProveedor(id: number, data: ProveedorBase) {
-    const res = await fetch(`${BASE}${id}`, {
+    const res = await apiFetch(`${BASE}${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -29,6 +30,6 @@ export async function updateProveedor(id: number, data: ProveedorBase) {
 }
 
 export async function deleteProveedor(id: number) {
-    const res = await fetch(`${BASE}${id}`, { method: 'DELETE' })
+    const res = await apiFetch(`${BASE}${id}`, { method: 'DELETE' })
     if (!res.ok) throw new Error('Error al eliminar proveedor')
 }

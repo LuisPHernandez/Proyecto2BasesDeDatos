@@ -77,8 +77,8 @@ Se definen exactamente 5 roles en PostgreSQL mediante `CREATE ROLE`. El usuario 
 
 | Objeto | rol_admin | rol_gerente | rol_vendedor | rol_bodeguero | rol_auditor |
 |---|---|---|---|---|---|
-| `proveedor` | ALL | SELECT | - | SELECT | SELECT |
-| `categoria` | ALL | SELECT | - | SELECT, INSERT, UPDATE | SELECT |
+| `proveedor` | ALL | SELECT | SELECT | SELECT | SELECT |
+| `categoria` | ALL | SELECT | SELECT | SELECT, INSERT, UPDATE | SELECT |
 | `producto` | ALL | SELECT | SELECT, UPDATE `unidades_disponibles` | SELECT, INSERT, UPDATE | SELECT |
 | `empleado` | ALL | SELECT | SELECT | - | SELECT |
 | `cliente` | ALL | SELECT | SELECT, INSERT | - | SELECT |
